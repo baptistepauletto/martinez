@@ -1277,7 +1277,10 @@ class WebcamFilters {
     }
 
     drawPilotMask(landmarks) {
-        // Get key face landmarks for pilot gear positioning
+        // First, draw the beautiful sky background everywhere
+        this.drawFullSkyBackground();
+        
+        // Get key face landmarks for face boundary detection
         const forehead = this.getLandmarkPoint(landmarks, 10);
         const leftEye = this.getLandmarkPoint(landmarks, 33);
         const rightEye = this.getLandmarkPoint(landmarks, 263);
@@ -1286,23 +1289,30 @@ class WebcamFilters {
         const chin = this.getLandmarkPoint(landmarks, 175);
         const leftTemple = this.getLandmarkPoint(landmarks, 127);
         const rightTemple = this.getLandmarkPoint(landmarks, 356);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
         
-        // Calculate dimensions
+        // Calculate face dimensions
         const eyeDistance = Math.abs(rightEye.x - leftEye.x);
-        const faceWidth = eyeDistance * 2;
-        const faceHeight = Math.abs(chin.y - forehead.y);
+        const faceWidth = eyeDistance * 2.2; // A bit wider for natural look
+        const faceHeight = Math.abs(chin.y - forehead.y) * 1.3; // A bit taller
+        const faceCenterX = (leftEye.x + rightEye.x) / 2;
+        const faceCenterY = (forehead.y + chin.y) / 2;
         
-        // Draw subtle cockpit overlay (without covering the face)
+        // Create face cutout - draw the real video only in the face area
+        this.drawFaceCutout(faceCenterX, faceCenterY, faceWidth, faceHeight);
+        
+        // Add subtle cockpit overlay elements
         this.drawCockpitOverlay();
         
-        // Draw pilot helmet
-        this.drawPilotHelmet(landmarks, faceWidth, faceHeight);
+        // Draw pilot helmet (adjusted to not cover face area)
+        this.drawPilotHelmet(landmarks, faceWidth * 0.8, faceHeight * 0.8);
         
         // Draw aviation goggles
         this.drawAviationGoggles(landmarks, eyeDistance);
         
-        // Draw oxygen mask (optional, positioned below nose)
-        this.drawOxygenMask(landmarks, faceWidth);
+        // Draw oxygen mask (positioned below nose, smaller)
+        this.drawOxygenMask(landmarks, faceWidth * 0.8);
         
         // Draw cockpit HUD elements
         this.drawCockpitHUD();
@@ -1836,6 +1846,103 @@ class WebcamFilters {
                 this.ctx.fill();
             }
         }
+        
+        this.ctx.restore();
+    }
+    
+    drawFullSkyBackground() {
+        // Save current canvas state
+        this.ctx.save();
+        
+        // Create beautiful sky gradient background
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+        gradient.addColorStop(0, '#87CEEB'); // Sky blue at top
+        gradient.addColorStop(0.3, '#B0E0E6'); // Lighter blue
+        gradient.addColorStop(0.7, '#E0F6FF'); // Even lighter
+        gradient.addColorStop(1, '#F0F8FF'); // Almost white at bottom
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw beautiful moving clouds
+        const time = Date.now() * 0.001;
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        
+        // Multiple cloud layers for depth
+        for (let layer = 0; layer < 3; layer++) {
+            const layerSpeed = (layer + 1) * 10;
+            const layerOpacity = 0.9 - layer * 0.2;
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${layerOpacity})`;
+            
+            for (let i = 0; i < 6 + layer * 2; i++) {
+                const cloudX = (this.canvas.width * 0.15 * i + time * layerSpeed + i * 80) % (this.canvas.width + 300) - 150;
+                const cloudY = this.canvas.height * (0.1 + layer * 0.15) + Math.sin(time + i + layer) * 30;
+                const cloudSize = 1 + layer * 0.3;
+                
+                // Draw fluffy cloud with multiple circles
+                for (let j = 0; j < 6; j++) {
+                    const radius = (12 + j * 4 + Math.sin(time * 2 + i + j + layer) * 3) * cloudSize;
+                    const offsetX = j * 10 * cloudSize - 25;
+                    const offsetY = Math.sin(j + time + layer) * 5;
+                    this.ctx.beginPath();
+                    this.ctx.arc(cloudX + offsetX, cloudY + offsetY, radius, 0, 2 * Math.PI);
+                    this.ctx.fill();
+                }
+            }
+        }
+        
+        // Add some birds flying
+        this.ctx.strokeStyle = 'rgba(50, 50, 50, 0.6)';
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
+        
+        for (let i = 0; i < 4; i++) {
+            const birdX = (this.canvas.width * 0.25 * i + time * 25 + i * 150) % (this.canvas.width + 200) - 100;
+            const birdY = this.canvas.height * 0.2 + Math.sin(time * 3 + i) * 40;
+            
+            // Simple bird shape
+            this.ctx.beginPath();
+            this.ctx.moveTo(birdX - 8, birdY);
+            this.ctx.quadraticCurveTo(birdX - 4, birdY - 4, birdX, birdY);
+            this.ctx.quadraticCurveTo(birdX + 4, birdY - 4, birdX + 8, birdY);
+            this.ctx.stroke();
+        }
+        
+        this.ctx.restore();
+    }
+    
+    drawFaceCutout(centerX, centerY, faceWidth, faceHeight) {
+        // Save the current state
+        this.ctx.save();
+        
+        // Create an oval mask for the face area
+        this.ctx.globalCompositeOperation = 'destination-out';
+        
+        // Clear the face area to show the original video
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX, centerY, faceWidth * 0.5, faceHeight * 0.45, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Reset composite operation
+        this.ctx.globalCompositeOperation = 'source-over';
+        
+        // Now draw the original video frame only in the face area
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX, centerY, faceWidth * 0.5, faceHeight * 0.45, 0, 0, 2 * Math.PI);
+        this.ctx.clip();
+        
+        // Draw the original video in the clipped area
+        this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+        
+        this.ctx.restore();
+        
+        // Add a subtle border around the face cutout
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX, centerY, faceWidth * 0.5, faceHeight * 0.45, 0, 0, 2 * Math.PI);
+        this.ctx.stroke();
         
         this.ctx.restore();
     }
