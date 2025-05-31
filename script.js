@@ -189,6 +189,9 @@ class WebcamFilters {
             case 'pirate':
                 this.drawPirateHat(landmarks);
                 break;
+            case 'crazy-face':
+                this.drawCrazyFace(landmarks);
+                break;
         }
     }
 
@@ -682,6 +685,349 @@ class WebcamFilters {
         this.ctx.beginPath();
         this.ctx.ellipse(leftEye.x - patchSize * 0.2, leftEye.y - patchSize * 0.2, patchSize * 0.3, patchSize * 0.2, 0, 0, 2 * Math.PI);
         this.ctx.fill();
+    }
+
+    drawCrazyFace(landmarks) {
+        // Get the current video frame data
+        const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        const data = imageData.data;
+        
+        // Create a new image data for the distorted version
+        const distortedImageData = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+        const distortedData = distortedImageData.data;
+        
+        // Get key face landmarks
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const chin = this.getLandmarkPoint(landmarks, 175);
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        
+        // Calculate face center and dimensions
+        const faceCenter = {
+            x: (leftEye.x + rightEye.x) / 2,
+            y: (forehead.y + chin.y) / 2
+        };
+        
+        const faceWidth = Math.abs(rightEye.x - leftEye.x) * 2;
+        const faceHeight = Math.abs(chin.y - forehead.y);
+        
+        // Animation time for dynamic effects - MUCH FASTER AND CRAZIER!
+        const time = Date.now() * 0.008; // Increased speed!
+        const crazyTime = Date.now() * 0.015; // Even faster for some effects!
+        
+        // Apply EXTREME crazy distortions
+        for (let y = 0; y < this.canvas.height; y++) {
+            for (let x = 0; x < this.canvas.width; x++) {
+                let sourceX = x;
+                let sourceY = y;
+                
+                // Calculate distance from face center
+                const dx = x - faceCenter.x;
+                const dy = y - faceCenter.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx);
+                
+                // Only apply distortions within face area
+                if (distance < faceWidth * 1.2) { // Expanded area!
+                    
+                    // 1. MEGA SWIRL effect around nose - MUCH STRONGER!
+                    const noseDx = x - nose.x;
+                    const noseDy = y - nose.y;
+                    const noseDistance = Math.sqrt(noseDx * noseDx + noseDy * noseDy);
+                    if (noseDistance < faceWidth * 0.4) {
+                        const swirlStrength = (1 - noseDistance / (faceWidth * 0.4)) * 2.5; // MUCH STRONGER!
+                        const swirlAngle = angle + swirlStrength * Math.sin(crazyTime * 4) * Math.cos(time * 3);
+                        sourceX = nose.x + Math.cos(swirlAngle) * noseDistance * (1 + Math.sin(time * 6) * 0.5);
+                        sourceY = nose.y + Math.sin(swirlAngle) * noseDistance * (1 + Math.cos(time * 5) * 0.5);
+                    }
+                    
+                    // 2. EXTREME bulge effect around eyes - PULSATING MADNESS!
+                    const leftEyeDist = Math.sqrt((x - leftEye.x) ** 2 + (y - leftEye.y) ** 2);
+                    const rightEyeDist = Math.sqrt((x - rightEye.x) ** 2 + (y - rightEye.y) ** 2);
+                    
+                    if (leftEyeDist < faceWidth * 0.25) {
+                        const bulgeStrength = (1 - leftEyeDist / (faceWidth * 0.25)) * 50 * Math.sin(crazyTime * 8) * Math.cos(time * 4);
+                        const eyeAngle = Math.atan2(y - leftEye.y, x - leftEye.x);
+                        sourceX += Math.cos(eyeAngle) * bulgeStrength;
+                        sourceY += Math.sin(eyeAngle) * bulgeStrength;
+                    }
+                    
+                    if (rightEyeDist < faceWidth * 0.25) {
+                        const bulgeStrength = (1 - rightEyeDist / (faceWidth * 0.25)) * 50 * Math.sin(crazyTime * 8 + Math.PI) * Math.sin(time * 6);
+                        const eyeAngle = Math.atan2(y - rightEye.y, x - rightEye.x);
+                        sourceX += Math.cos(eyeAngle) * bulgeStrength;
+                        sourceY += Math.sin(eyeAngle) * bulgeStrength;
+                    }
+                    
+                    // 3. INSANE mouth stretch effect - ELASTIC MADNESS!
+                    const mouthDist = Math.sqrt((x - mouth.x) ** 2 + (y - mouth.y) ** 2);
+                    if (mouthDist < faceWidth * 0.3) {
+                        const stretchStrength = (1 - mouthDist / (faceWidth * 0.3)) * 40 * Math.sin(crazyTime * 10);
+                        sourceX += (x - mouth.x) * stretchStrength * 0.03 * Math.cos(time * 7);
+                        sourceY += Math.sin(crazyTime * 12) * 25 * Math.cos(x * 0.05);
+                    }
+                    
+                    // 4. CHAOTIC wave distortion - MULTIPLE WAVES!
+                    const waveStrength = (1 - distance / (faceWidth * 1.2)) * 20;
+                    sourceX += Math.sin(y * 0.03 + crazyTime * 5) * waveStrength * Math.cos(time * 3);
+                    sourceY += Math.cos(x * 0.03 + crazyTime * 4) * waveStrength * Math.sin(time * 4);
+                    sourceX += Math.sin(y * 0.01 + time * 8) * waveStrength * 0.5;
+                    sourceY += Math.cos(x * 0.01 + time * 6) * waveStrength * 0.5;
+                    
+                    // 5. EXTREME pinch/expand effect - BREATHING FACE!
+                    const centerEffect = Math.sin(crazyTime * 3) * 0.4 + Math.cos(time * 5) * 0.3;
+                    const distortionFactor = 1 + centerEffect * (1 - distance / (faceWidth * 1.2));
+                    sourceX = faceCenter.x + (sourceX - faceCenter.x) * distortionFactor;
+                    sourceY = faceCenter.y + (sourceY - faceCenter.y) * distortionFactor;
+                    
+                    // 6. NEW! KALEIDOSCOPE effect!
+                    const kaleidoAngle = Math.atan2(dy, dx);
+                    const kaleidoRadius = distance;
+                    const segments = 6;
+                    const segmentAngle = (2 * Math.PI) / segments;
+                    const normalizedAngle = ((kaleidoAngle % segmentAngle) + segmentAngle) % segmentAngle;
+                    if (Math.sin(time * 4) > 0.5) {
+                        const newAngle = normalizedAngle + Math.sin(crazyTime * 6) * 0.5;
+                        sourceX = faceCenter.x + Math.cos(newAngle) * kaleidoRadius;
+                        sourceY = faceCenter.y + Math.sin(newAngle) * kaleidoRadius;
+                    }
+                    
+                    // 7. NEW! FRACTAL ZOOM effect!
+                    if (Math.cos(time * 2) > 0.3) {
+                        const fractalScale = 1 + Math.sin(crazyTime * 7) * 0.8;
+                        const fractalX = faceCenter.x + (sourceX - faceCenter.x) * fractalScale;
+                        const fractalY = faceCenter.y + (sourceY - faceCenter.y) * fractalScale;
+                        sourceX = fractalX;
+                        sourceY = fractalY;
+                    }
+                }
+                
+                // Ensure source coordinates are within bounds
+                sourceX = Math.max(0, Math.min(this.canvas.width - 1, Math.round(sourceX)));
+                sourceY = Math.max(0, Math.min(this.canvas.height - 1, Math.round(sourceY)));
+                
+                // Copy pixel data with COLOR MADNESS!
+                const targetIndex = (y * this.canvas.width + x) * 4;
+                const sourceIndex = (sourceY * this.canvas.width + sourceX) * 4;
+                
+                // CRAZY COLOR EFFECTS!
+                const colorShift = Math.sin(crazyTime * 10 + x * 0.02 + y * 0.02) * 100;
+                const redShift = Math.sin(time * 8 + distance * 0.01) * 50;
+                const greenShift = Math.cos(time * 6 + angle) * 50;
+                const blueShift = Math.sin(time * 12 + distance * 0.02) * 50;
+                
+                distortedData[targetIndex] = Math.max(0, Math.min(255, data[sourceIndex] + redShift + colorShift));         // Red
+                distortedData[targetIndex + 1] = Math.max(0, Math.min(255, data[sourceIndex + 1] + greenShift - colorShift * 0.5)); // Green
+                distortedData[targetIndex + 2] = Math.max(0, Math.min(255, data[sourceIndex + 2] + blueShift + colorShift * 0.3)); // Blue
+                distortedData[targetIndex + 3] = data[sourceIndex + 3]; // Alpha
+            }
+        }
+        
+        // Apply the distorted image
+        this.ctx.putImageData(distortedImageData, 0, 0);
+        
+        // Add EVEN MORE crazy visual effects on top
+        this.addUltraCrazyEffects(landmarks, time, crazyTime);
+    }
+    
+    addUltraCrazyEffects(landmarks, time, crazyTime) {
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const chin = this.getLandmarkPoint(landmarks, 175);
+        
+        // MEGA CRAZY spinning eyes - MUCH MORE INTENSE!
+        this.ctx.strokeStyle = `hsl(${(crazyTime * 100) % 360}, 100%, 50%)`;
+        this.ctx.lineWidth = 5;
+        
+        for (let i = 0; i < 16; i++) { // DOUBLED the spirals!
+            const angle = (crazyTime * 15 + i * Math.PI / 8);
+            const radius = 25 + Math.sin(crazyTime * 8) * 15;
+            const pulseRadius = radius * (1 + Math.sin(time * 12 + i) * 0.5);
+            
+            // Left eye MEGA spirals
+            this.ctx.beginPath();
+            this.ctx.moveTo(leftEye.x, leftEye.y);
+            this.ctx.lineTo(
+                leftEye.x + Math.cos(angle) * pulseRadius,
+                leftEye.y + Math.sin(angle) * pulseRadius
+            );
+            this.ctx.stroke();
+            
+            // Right eye MEGA spirals
+            this.ctx.beginPath();
+            this.ctx.moveTo(rightEye.x, rightEye.y);
+            this.ctx.lineTo(
+                rightEye.x + Math.cos(-angle * 1.5) * pulseRadius,
+                rightEye.y + Math.sin(-angle * 1.5) * pulseRadius
+            );
+            this.ctx.stroke();
+        }
+        
+        // INSANE mouth effects - ELECTRIC CHAOS!
+        this.ctx.strokeStyle = `hsl(${(time * 200) % 360}, 100%, 50%)`;
+        this.ctx.lineWidth = 6;
+        this.ctx.lineCap = 'round';
+        
+        for (let i = 0; i < 12; i++) { // MORE mouth lines!
+            const offset = Math.sin(crazyTime * 12 + i) * 40;
+            const verticalOffset = Math.cos(time * 8 + i) * 30;
+            this.ctx.beginPath();
+            this.ctx.moveTo(mouth.x - 60 + i * 10, mouth.y);
+            this.ctx.lineTo(mouth.x - 60 + i * 10 + offset, mouth.y + offset + verticalOffset);
+            this.ctx.stroke();
+        }
+        
+        // MEGA floating particles around face - PARTICLE STORM!
+        for (let i = 0; i < 25; i++) { // MORE PARTICLES!
+            const particleAngle = crazyTime * 5 + i * Math.PI / 12.5;
+            const particleRadius = 100 + Math.sin(crazyTime * 6 + i) * 60;
+            const particleX = nose.x + Math.cos(particleAngle) * particleRadius;
+            const particleY = nose.y + Math.sin(particleAngle) * particleRadius;
+            const particleSize = 5 + Math.sin(crazyTime * 15 + i) * 4;
+            
+            this.ctx.fillStyle = `hsl(${(crazyTime * 50 + i * 15) % 360}, 100%, 50%)`;
+            this.ctx.beginPath();
+            this.ctx.arc(particleX, particleY, particleSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            // Add particle trails!
+            this.ctx.strokeStyle = `hsl(${(crazyTime * 50 + i * 15) % 360}, 100%, 30%)`;
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            this.ctx.moveTo(particleX, particleY);
+            this.ctx.lineTo(
+                particleX - Math.cos(particleAngle) * 20,
+                particleY - Math.sin(particleAngle) * 20
+            );
+            this.ctx.stroke();
+        }
+        
+        // NEW! LIGHTNING BOLTS around face!
+        this.ctx.strokeStyle = '#FFFF00';
+        this.ctx.lineWidth = 4;
+        this.ctx.shadowColor = '#FFFF00';
+        this.ctx.shadowBlur = 10;
+        
+        for (let i = 0; i < 8; i++) {
+            if (Math.sin(crazyTime * 20 + i) > 0.7) {
+                const startAngle = (i * Math.PI / 4) + Math.sin(time * 10) * 0.5;
+                const startX = nose.x + Math.cos(startAngle) * 80;
+                const startY = nose.y + Math.sin(startAngle) * 80;
+                const endX = nose.x + Math.cos(startAngle) * 150;
+                const endY = nose.y + Math.sin(startAngle) * 150;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(startX, startY);
+                // Zigzag lightning effect
+                for (let j = 0; j < 5; j++) {
+                    const progress = j / 4;
+                    const x = startX + (endX - startX) * progress + Math.sin(crazyTime * 30 + j) * 15;
+                    const y = startY + (endY - startY) * progress + Math.cos(crazyTime * 25 + j) * 15;
+                    this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+            }
+        }
+        this.ctx.shadowBlur = 0;
+        
+        // NEW! CRAZY GEOMETRIC SHAPES!
+        this.ctx.strokeStyle = `hsl(${(time * 300) % 360}, 100%, 50%)`;
+        this.ctx.lineWidth = 3;
+        
+        // Rotating triangles around eyes
+        for (let i = 0; i < 6; i++) {
+            const triangleAngle = crazyTime * 8 + i * Math.PI / 3;
+            const triangleSize = 20 + Math.sin(time * 10 + i) * 10;
+            
+            // Left eye triangles
+            this.ctx.beginPath();
+            for (let j = 0; j < 3; j++) {
+                const pointAngle = triangleAngle + j * (2 * Math.PI / 3);
+                const x = leftEye.x + Math.cos(pointAngle) * triangleSize;
+                const y = leftEye.y + Math.sin(pointAngle) * triangleSize;
+                if (j === 0) this.ctx.moveTo(x, y);
+                else this.ctx.lineTo(x, y);
+            }
+            this.ctx.closePath();
+            this.ctx.stroke();
+            
+            // Right eye triangles
+            this.ctx.beginPath();
+            for (let j = 0; j < 3; j++) {
+                const pointAngle = -triangleAngle + j * (2 * Math.PI / 3);
+                const x = rightEye.x + Math.cos(pointAngle) * triangleSize;
+                const y = rightEye.y + Math.sin(pointAngle) * triangleSize;
+                if (j === 0) this.ctx.moveTo(x, y);
+                else this.ctx.lineTo(x, y);
+            }
+            this.ctx.closePath();
+            this.ctx.stroke();
+        }
+        
+        // NEW! PULSATING CIRCLES OF MADNESS!
+        for (let i = 0; i < 5; i++) {
+            const circleRadius = 30 + i * 20 + Math.sin(crazyTime * 6 + i) * 15;
+            this.ctx.strokeStyle = `hsl(${(crazyTime * 80 + i * 72) % 360}, 100%, 50%)`;
+            this.ctx.lineWidth = 3;
+            this.ctx.beginPath();
+            this.ctx.arc(nose.x, nose.y, circleRadius, 0, 2 * Math.PI);
+            this.ctx.stroke();
+        }
+        
+        // ULTRA CRAZY text overlay - MULTIPLE TEXTS!
+        const crazyTexts = ['DINGUE!', 'FOLIE!', 'MALADE!', 'OUFFF!'];
+        
+        for (let i = 0; i < crazyTexts.length; i++) {
+            this.ctx.font = `bold ${20 + Math.sin(crazyTime * 8 + i) * 10}px Arial`;
+            this.ctx.fillStyle = `hsl(${(crazyTime * 150 + i * 90) % 360}, 100%, 50%)`;
+            this.ctx.strokeStyle = `hsl(${(crazyTime * 150 + i * 90 + 180) % 360}, 100%, 50%)`;
+            this.ctx.lineWidth = 3;
+            this.ctx.textAlign = 'center';
+            
+            const textAngle = (crazyTime * 3 + i * Math.PI / 2);
+            const textRadius = 120 + Math.sin(time * 5 + i) * 30;
+            const textX = nose.x + Math.cos(textAngle) * textRadius;
+            const textY = nose.y + Math.sin(textAngle) * textRadius;
+            
+            this.ctx.save();
+            this.ctx.translate(textX, textY);
+            this.ctx.rotate(crazyTime * 5 + i);
+            this.ctx.strokeText(crazyTexts[i], 0, 0);
+            this.ctx.fillText(crazyTexts[i], 0, 0);
+            this.ctx.restore();
+        }
+        
+        // NEW! SCREEN SHAKE EFFECT!
+        if (Math.sin(crazyTime * 20) > 0.8) {
+            const shakeX = Math.sin(crazyTime * 50) * 5;
+            const shakeY = Math.cos(crazyTime * 60) * 5;
+            this.ctx.save();
+            this.ctx.translate(shakeX, shakeY);
+            // The shake effect is applied to subsequent drawings
+            this.ctx.restore();
+        }
+        
+        // NEW! RAINBOW TRAILS!
+        this.ctx.strokeStyle = `hsl(${(crazyTime * 200) % 360}, 100%, 50%)`;
+        this.ctx.lineWidth = 8;
+        this.ctx.lineCap = 'round';
+        
+        for (let i = 0; i < 3; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(forehead.x, forehead.y);
+            this.ctx.quadraticCurveTo(
+                nose.x + Math.sin(crazyTime * 4 + i) * 50,
+                nose.y + Math.cos(crazyTime * 3 + i) * 30,
+                chin.x + Math.sin(crazyTime * 5 + i) * 40,
+                chin.y
+            );
+            this.ctx.stroke();
+        }
     }
 
     getLandmarkPoint(landmarks, index) {
