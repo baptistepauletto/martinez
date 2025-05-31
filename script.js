@@ -198,6 +198,9 @@ class WebcamFilters {
             case 'pilot':
                 this.drawPilotMask(landmarks);
                 break;
+            case 'angry':
+                this.drawAngryFace(landmarks);
+                break;
         }
     }
 
@@ -1945,6 +1948,341 @@ class WebcamFilters {
         this.ctx.stroke();
         
         this.ctx.restore();
+    }
+    
+    drawAngryFace(landmarks) {
+        // Get key face landmarks
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const leftEyebrow = this.getLandmarkPoint(landmarks, 70);
+        const rightEyebrow = this.getLandmarkPoint(landmarks, 300);
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        
+        // Calculate dimensions
+        const eyeDistance = Math.abs(rightEye.x - leftEye.x);
+        const faceWidth = eyeDistance * 2;
+        
+        // Draw thick angry eyebrows
+        this.drawAngryEyebrows(landmarks, eyeDistance);
+        
+        // Draw furrowed angry brow lines
+        this.drawFurrowedBrow(landmarks, eyeDistance);
+        
+        // Draw angry steam from head
+        this.drawAngrySteem(landmarks, faceWidth);
+        
+        // Draw angry mouth lines/gritted teeth effect
+        this.drawAngryMouth(landmarks, eyeDistance);
+        
+        // Draw angry red cheeks/face flush
+        this.drawAngryFlush(landmarks, faceWidth);
+        
+        // Draw angry vein on forehead
+        this.drawAngryVein(landmarks, eyeDistance);
+        
+        // Draw angry fire effects
+        this.drawAngryFire(landmarks, faceWidth);
+    }
+    
+    drawAngryEyebrows(landmarks, eyeDistance) {
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const leftEyebrow = this.getLandmarkPoint(landmarks, 70);
+        const rightEyebrow = this.getLandmarkPoint(landmarks, 300);
+        
+        const browThickness = eyeDistance * 0.15;
+        const browLength = eyeDistance * 0.8;
+        
+        // Dark angry brown color
+        this.ctx.fillStyle = '#2F1B14';
+        this.ctx.strokeStyle = '#1A0F0A';
+        this.ctx.lineWidth = 2;
+        
+        // Left angry eyebrow (angled downward toward center)
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftEye.x - browLength * 0.6, leftEyebrow.y - browThickness * 0.5);
+        this.ctx.lineTo(leftEye.x + browLength * 0.2, leftEyebrow.y - browThickness * 2); // Angled down
+        this.ctx.lineTo(leftEye.x + browLength * 0.3, leftEyebrow.y - browThickness * 1.5);
+        this.ctx.lineTo(leftEye.x - browLength * 0.5, leftEyebrow.y + browThickness * 0.5);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Right angry eyebrow (angled downward toward center)
+        this.ctx.beginPath();
+        this.ctx.moveTo(rightEye.x + browLength * 0.6, rightEyebrow.y - browThickness * 0.5);
+        this.ctx.lineTo(rightEye.x - browLength * 0.2, rightEyebrow.y - browThickness * 2); // Angled down
+        this.ctx.lineTo(rightEye.x - browLength * 0.3, rightEyebrow.y - browThickness * 1.5);
+        this.ctx.lineTo(rightEye.x + browLength * 0.5, rightEyebrow.y + browThickness * 0.5);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Add extra angry brow hair details
+        this.ctx.strokeStyle = '#2F1B14';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        
+        // Left brow hair strokes
+        for (let i = 0; i < 8; i++) {
+            const hairX = leftEye.x - browLength * 0.5 + (browLength * 0.6 / 7) * i;
+            const hairY1 = leftEyebrow.y - browThickness * 0.3;
+            const hairY2 = leftEyebrow.y + browThickness * 0.3;
+            const angleOffset = (i - 4) * 0.1;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(hairX, hairY1);
+            this.ctx.lineTo(hairX + Math.sin(angleOffset) * 8, hairY2);
+            this.ctx.stroke();
+        }
+        
+        // Right brow hair strokes
+        for (let i = 0; i < 8; i++) {
+            const hairX = rightEye.x + browLength * 0.5 - (browLength * 0.6 / 7) * i;
+            const hairY1 = rightEyebrow.y - browThickness * 0.3;
+            const hairY2 = rightEyebrow.y + browThickness * 0.3;
+            const angleOffset = (i - 4) * -0.1;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(hairX, hairY1);
+            this.ctx.lineTo(hairX + Math.sin(angleOffset) * 8, hairY2);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawFurrowedBrow(landmarks, eyeDistance) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        
+        // Dark lines for furrowed brow
+        this.ctx.strokeStyle = '#8B4513';
+        this.ctx.lineWidth = 4;
+        this.ctx.lineCap = 'round';
+        
+        // Center frown line (deepest)
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x, forehead.y - eyeDistance * 0.1);
+        this.ctx.lineTo(forehead.x, forehead.y + eyeDistance * 0.3);
+        this.ctx.stroke();
+        
+        // Left frown line
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x - eyeDistance * 0.15, forehead.y);
+        this.ctx.lineTo(forehead.x - eyeDistance * 0.1, forehead.y + eyeDistance * 0.25);
+        this.ctx.stroke();
+        
+        // Right frown line
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x + eyeDistance * 0.15, forehead.y);
+        this.ctx.lineTo(forehead.x + eyeDistance * 0.1, forehead.y + eyeDistance * 0.25);
+        this.ctx.stroke();
+        
+        // Additional wrinkle lines
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = '#A0522D';
+        
+        for (let i = 0; i < 3; i++) {
+            const offset = (i - 1) * eyeDistance * 0.2;
+            this.ctx.beginPath();
+            this.ctx.moveTo(forehead.x + offset - eyeDistance * 0.1, forehead.y - eyeDistance * 0.05);
+            this.ctx.lineTo(forehead.x + offset + eyeDistance * 0.1, forehead.y + eyeDistance * 0.15);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawAngrySteem(landmarks, faceWidth) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const time = Date.now() * 0.005;
+        
+        // Draw animated steam coming from head
+        this.ctx.strokeStyle = '#DCDCDC';
+        this.ctx.lineWidth = 6;
+        this.ctx.lineCap = 'round';
+        
+        // Multiple steam lines
+        for (let i = 0; i < 6; i++) {
+            const steamX = forehead.x + (i - 2.5) * (faceWidth * 0.1);
+            const steamStartY = forehead.y - faceWidth * 0.3;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(steamX, steamStartY);
+            
+            // Wavy steam effect
+            for (let j = 1; j <= 8; j++) {
+                const waveX = steamX + Math.sin(time + i + j * 0.5) * (j * 2);
+                const waveY = steamStartY - j * 8;
+                this.ctx.lineTo(waveX, waveY);
+            }
+            this.ctx.stroke();
+        }
+        
+        // Add steam puffs
+        this.ctx.fillStyle = 'rgba(220, 220, 220, 0.6)';
+        for (let i = 0; i < 4; i++) {
+            const puffX = forehead.x + (i - 1.5) * (faceWidth * 0.15) + Math.sin(time + i) * 5;
+            const puffY = forehead.y - faceWidth * 0.4 - Math.sin(time * 2 + i) * 10;
+            const puffSize = 8 + Math.sin(time * 3 + i) * 3;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(puffX, puffY, puffSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+    }
+    
+    drawAngryMouth(landmarks, eyeDistance) {
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const leftMouth = this.getLandmarkPoint(landmarks, 61);
+        const rightMouth = this.getLandmarkPoint(landmarks, 291);
+        
+        // Angry gritted teeth lines
+        this.ctx.strokeStyle = '#8B4513';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        
+        // Downward mouth lines (angry frown)
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftMouth.x, leftMouth.y);
+        this.ctx.quadraticCurveTo(mouth.x, mouth.y + eyeDistance * 0.2, rightMouth.x, rightMouth.y);
+        this.ctx.stroke();
+        
+        // Gritted teeth lines
+        const mouthWidth = Math.abs(rightMouth.x - leftMouth.x);
+        for (let i = 0; i < 6; i++) {
+            const teethX = leftMouth.x + (mouthWidth / 5) * i;
+            this.ctx.beginPath();
+            this.ctx.moveTo(teethX, mouth.y - 5);
+            this.ctx.lineTo(teethX, mouth.y + 5);
+            this.ctx.stroke();
+        }
+        
+        // Angry mouth corner lines
+        this.ctx.lineWidth = 4;
+        
+        // Left corner
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftMouth.x - eyeDistance * 0.1, leftMouth.y - eyeDistance * 0.05);
+        this.ctx.lineTo(leftMouth.x, leftMouth.y + eyeDistance * 0.05);
+        this.ctx.stroke();
+        
+        // Right corner
+        this.ctx.beginPath();
+        this.ctx.moveTo(rightMouth.x + eyeDistance * 0.1, rightMouth.y - eyeDistance * 0.05);
+        this.ctx.lineTo(rightMouth.x, rightMouth.y + eyeDistance * 0.05);
+        this.ctx.stroke();
+    }
+    
+    drawAngryFlush(landmarks, faceWidth) {
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        
+        // Red angry flush on cheeks
+        this.ctx.fillStyle = 'rgba(255, 69, 69, 0.6)';
+        
+        // Left cheek flush
+        this.ctx.beginPath();
+        this.ctx.ellipse(leftCheek.x - faceWidth * 0.1, leftCheek.y, faceWidth * 0.15, faceWidth * 0.1, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Right cheek flush
+        this.ctx.beginPath();
+        this.ctx.ellipse(rightCheek.x + faceWidth * 0.1, rightCheek.y, faceWidth * 0.15, faceWidth * 0.1, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Additional angry red around eyes
+        this.ctx.fillStyle = 'rgba(255, 100, 100, 0.3)';
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        
+        // Left eye area
+        this.ctx.beginPath();
+        this.ctx.ellipse(leftEye.x, leftEye.y, faceWidth * 0.12, faceWidth * 0.08, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Right eye area
+        this.ctx.beginPath();
+        this.ctx.ellipse(rightEye.x, rightEye.y, faceWidth * 0.12, faceWidth * 0.08, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+    }
+    
+    drawAngryVein(landmarks, eyeDistance) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const time = Date.now() * 0.01;
+        
+        // Pulsating angry vein on forehead
+        const veinIntensity = Math.sin(time * 3) * 0.5 + 1;
+        this.ctx.strokeStyle = `rgba(139, 0, 0, ${0.7 * veinIntensity})`;
+        this.ctx.lineWidth = 4 * veinIntensity;
+        this.ctx.lineCap = 'round';
+        
+        // Main vein line
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x - eyeDistance * 0.2, forehead.y - eyeDistance * 0.15);
+        this.ctx.quadraticCurveTo(
+            forehead.x - eyeDistance * 0.05, 
+            forehead.y - eyeDistance * 0.25,
+            forehead.x + eyeDistance * 0.1, 
+            forehead.y - eyeDistance * 0.1
+        );
+        this.ctx.stroke();
+        
+        // Branch veins
+        this.ctx.lineWidth = 2 * veinIntensity;
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x - eyeDistance * 0.1, forehead.y - eyeDistance * 0.2);
+        this.ctx.lineTo(forehead.x - eyeDistance * 0.15, forehead.y - eyeDistance * 0.3);
+        this.ctx.stroke();
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x + eyeDistance * 0.05, forehead.y - eyeDistance * 0.15);
+        this.ctx.lineTo(forehead.x + eyeDistance * 0.1, forehead.y - eyeDistance * 0.25);
+        this.ctx.stroke();
+    }
+    
+    drawAngryFire(landmarks, faceWidth) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const time = Date.now() * 0.008;
+        
+        // Animated fire around the head for extreme anger
+        const fireColors = ['#FF4500', '#FF6347', '#FF8C00', '#FFD700'];
+        
+        for (let i = 0; i < 12; i++) {
+            const angle = (i * Math.PI * 2) / 12 + time;
+            const radius = faceWidth * 0.6 + Math.sin(time * 4 + i) * 10;
+            const fireX = forehead.x + Math.cos(angle) * radius;
+            const fireY = forehead.y + Math.sin(angle) * radius * 0.8;
+            
+            const colorIndex = Math.floor(Math.sin(time * 2 + i) * 2 + 2) % fireColors.length;
+            this.ctx.fillStyle = fireColors[colorIndex];
+            
+            // Flame shape
+            const flameHeight = 15 + Math.sin(time * 6 + i) * 8;
+            const flameWidth = 8 + Math.sin(time * 4 + i) * 4;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(fireX, fireY);
+            this.ctx.quadraticCurveTo(fireX - flameWidth, fireY - flameHeight * 0.6, fireX, fireY - flameHeight);
+            this.ctx.quadraticCurveTo(fireX + flameWidth, fireY - flameHeight * 0.6, fireX, fireY);
+            this.ctx.fill();
+        }
+        
+        // Add angry sparks
+        this.ctx.fillStyle = '#FFFF00';
+        for (let i = 0; i < 8; i++) {
+            const sparkX = forehead.x + Math.sin(time * 5 + i) * faceWidth * 0.8;
+            const sparkY = forehead.y + Math.cos(time * 4 + i) * faceWidth * 0.6;
+            const sparkSize = 2 + Math.sin(time * 8 + i) * 2;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(sparkX, sparkY, sparkSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
     }
 }
 
