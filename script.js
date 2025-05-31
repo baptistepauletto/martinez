@@ -207,6 +207,66 @@ class WebcamFilters {
             case 'medieval':
                 this.drawMedievalKnight(landmarks);
                 break;
+            case 'alien':
+                this.drawAlienInvasion(landmarks);
+                break;
+            case 'zombie':
+                this.drawZombieOutbreak(landmarks);
+                break;
+            case 'cyborg':
+                this.drawCyborgFuture(landmarks);
+                break;
+            case 'disco':
+                this.drawDiscoFever(landmarks);
+                break;
+            case 'mime':
+                this.drawMimePerformance(landmarks);
+                break;
+            case 'dragon':
+                this.drawDragonLord(landmarks);
+                break;
+            case 'magician':
+                this.drawMagicShow(landmarks);
+                break;
+            case 'underwater':
+                this.drawUnderwaterDiver(landmarks);
+                break;
+            case 'rockstar':
+                this.drawRockStar(landmarks);
+                break;
+            case 'chef':
+                this.drawChefMaster(landmarks);
+                break;
+            case 'realistic-beard':
+                this.drawRealisticBeard(landmarks);
+                break;
+            case 'makeup-glam':
+                this.drawMakeupGlam(landmarks);
+                break;
+            case 'battle-scars':
+                this.drawBattleScars(landmarks);
+                break;
+            case 'aging-time':
+                this.drawAgingEffect(landmarks);
+                break;
+            case 'face-tattoos':
+                this.drawFaceTattoos(landmarks);
+                break;
+            case 'snow-effect':
+                this.drawSnowEffect(landmarks);
+                break;
+            case 'golden-hour':
+                this.drawGoldenHour(landmarks);
+                break;
+            case 'cyberpunk-neon':
+                this.drawCyberpunkNeon(landmarks);
+                break;
+            case 'vintage-film':
+                this.drawVintageFilm(landmarks);
+                break;
+            case 'rain-glass':
+                this.drawRainGlass(landmarks);
+                break;
         }
     }
 
@@ -3021,811 +3081,51 @@ class WebcamFilters {
         this.ctx.stroke();
     }
 
-    getLandmarkPoint(landmarks, index) {
-        const point = landmarks[index];
-        return {
-            x: point.x * this.canvas.width,
-            y: point.y * this.canvas.height
-        };
-    }
-
-    setFilter(filterName) {
-        this.currentFilter = filterName;
-        
-        // Add transition animation
-        this.canvas.classList.add('filter-transition');
-        setTimeout(() => {
-            this.canvas.classList.remove('filter-transition');
-        }, 300);
-    }
-
-    updateFilterButtons(activeBtn) {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        activeBtn.classList.add('active');
-    }
-
-    capturePhoto() {
-        if (!this.isInitialized) return;
-        
-        // Create a temporary canvas to capture the current frame
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        tempCanvas.width = this.canvas.width;
-        tempCanvas.height = this.canvas.height;
-        
-        // Copy current canvas content
-        tempCtx.drawImage(this.canvas, 0, 0);
-        
-        // Convert to blob and create photo
-        tempCanvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            const timestamp = new Date().toLocaleString();
-            
-            this.photos.push({
-                url: url,
-                timestamp: timestamp,
-                filter: this.currentFilter
-            });
-            
-            this.updatePhotoGallery();
-            
-            // Show success feedback
-            this.showCaptureSuccess();
-        }, 'image/png');
-    }
-
-    updatePhotoGallery() {
-        if (this.photos.length === 0) {
-            this.photoGallery.style.display = 'none';
-            return;
-        }
-        
-        this.photoGallery.style.display = 'block';
-        this.photosGrid.innerHTML = '';
-        
-        this.photos.forEach((photo, index) => {
-            const photoItem = document.createElement('div');
-            photoItem.className = 'photo-item';
-            
-            photoItem.innerHTML = `
-                <img src="${photo.url}" alt="Filtered photo with ${photo.filter} filter">
-                <button class="download-btn" onclick="webcamFilters.downloadPhoto(${index})" title="Download photo">
-                    💾
-                </button>
-            `;
-            
-            this.photosGrid.appendChild(photoItem);
-        });
-    }
-
-    downloadPhoto(index) {
-        const photo = this.photos[index];
-        const link = document.createElement('a');
-        link.href = photo.url;
-        link.download = `filtered-selfie-${photo.filter}-${Date.now()}.png`;
-        link.click();
-    }
-
-    showCaptureSuccess() {
-        const button = this.captureBtn;
-        const originalText = button.innerHTML;
-        
-        button.innerHTML = '✅ Captured!';
-        button.style.background = 'linear-gradient(135deg, #00C851 0%, #007E33 100%)';
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.style.background = '';
-        }, 1500);
-    }
-
-    showLoading(show) {
-        this.loading.style.display = show ? 'block' : 'none';
-    }
-
-    drawCockpitOverlay() {
-        // Draw only cockpit frame elements around the edges without covering the face
-        this.ctx.save();
-        
-        // Draw cockpit frame elements
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        this.ctx.strokeStyle = '#555';
-        this.ctx.lineWidth = 2;
-        
-        // Top cockpit frame - thinner
-        this.ctx.fillRect(0, 0, this.canvas.width, 30);
-        
-        // Side cockpit frames - narrower 
-        this.ctx.fillRect(0, 0, 40, this.canvas.height);
-        this.ctx.fillRect(this.canvas.width - 40, 0, 40, this.canvas.height);
-        
-        // Bottom frame
-        this.ctx.fillRect(0, this.canvas.height - 30, this.canvas.width, 30);
-        
-        // Add some subtle cockpit details
-        this.ctx.strokeStyle = '#888';
-        this.ctx.lineWidth = 1;
-        
-        // Top frame details
-        for (let i = 0; i < 5; i++) {
-            const x = (this.canvas.width / 6) * (i + 1);
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, 5);
-            this.ctx.lineTo(x, 25);
-            this.ctx.stroke();
-        }
-        
-        // Side frame rivets
-        for (let i = 0; i < 8; i++) {
-            const y = (this.canvas.height / 9) * (i + 1);
-            // Left side
-            this.ctx.fillStyle = '#666';
-            this.ctx.beginPath();
-            this.ctx.arc(20, y, 2, 0, 2 * Math.PI);
-            this.ctx.fill();
-            
-            // Right side
-            this.ctx.beginPath();
-            this.ctx.arc(this.canvas.width - 20, y, 2, 0, 2 * Math.PI);
-            this.ctx.fill();
-        }
-        
-        // Add subtle sky effect in top corners only
-        const gradient = this.ctx.createLinearGradient(0, 30, 0, this.canvas.height * 0.3);
-        gradient.addColorStop(0, 'rgba(135, 206, 235, 0.1)'); // Light sky blue
-        gradient.addColorStop(1, 'rgba(135, 206, 235, 0)'); // Transparent
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(40, 30, this.canvas.width - 80, this.canvas.height * 0.2);
-        
-        // Add subtle clouds in top area only
-        const time = Date.now() * 0.001;
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-        
-        for (let i = 0; i < 3; i++) {
-            const cloudX = (this.canvas.width * 0.3 * i + time * 15 + i * 100) % (this.canvas.width + 100) - 50;
-            const cloudY = 50 + Math.sin(time + i) * 10;
-            
-            // Small clouds in top area only
-            for (let j = 0; j < 3; j++) {
-                const radius = 8 + j * 3;
-                const offsetX = j * 8 - 8;
-                this.ctx.beginPath();
-                this.ctx.arc(cloudX + offsetX, cloudY, radius, 0, 2 * Math.PI);
-                this.ctx.fill();
-            }
-        }
-        
-        this.ctx.restore();
-    }
-    
-    drawFullSkyBackground() {
-        // Save current canvas state
-        this.ctx.save();
-        
-        // Create beautiful sky gradient background
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-        gradient.addColorStop(0, '#87CEEB'); // Sky blue at top
-        gradient.addColorStop(0.3, '#B0E0E6'); // Lighter blue
-        gradient.addColorStop(0.7, '#E0F6FF'); // Even lighter
-        gradient.addColorStop(1, '#F0F8FF'); // Almost white at bottom
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Draw beautiful moving clouds
-        const time = Date.now() * 0.001;
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        
-        // Multiple cloud layers for depth
-        for (let layer = 0; layer < 3; layer++) {
-            const layerSpeed = (layer + 1) * 10;
-            const layerOpacity = 0.9 - layer * 0.2;
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${layerOpacity})`;
-            
-            for (let i = 0; i < 6 + layer * 2; i++) {
-                const cloudX = (this.canvas.width * 0.15 * i + time * layerSpeed + i * 80) % (this.canvas.width + 300) - 150;
-                const cloudY = this.canvas.height * (0.1 + layer * 0.15) + Math.sin(time + i + layer) * 30;
-                const cloudSize = 1 + layer * 0.3;
-                
-                // Draw fluffy cloud with multiple circles
-                for (let j = 0; j < 6; j++) {
-                    const radius = (12 + j * 4 + Math.sin(time * 2 + i + j + layer) * 3) * cloudSize;
-                    const offsetX = j * 10 * cloudSize - 25;
-                    const offsetY = Math.sin(j + time + layer) * 5;
-                    this.ctx.beginPath();
-                    this.ctx.arc(cloudX + offsetX, cloudY + offsetY, radius, 0, 2 * Math.PI);
-                    this.ctx.fill();
-                }
-            }
-        }
-        
-        // Add some birds flying
-        this.ctx.strokeStyle = 'rgba(50, 50, 50, 0.6)';
-        this.ctx.lineWidth = 2;
-        this.ctx.lineCap = 'round';
-        
-        for (let i = 0; i < 4; i++) {
-            const birdX = (this.canvas.width * 0.25 * i + time * 25 + i * 150) % (this.canvas.width + 200) - 100;
-            const birdY = this.canvas.height * 0.2 + Math.sin(time * 3 + i) * 40;
-            
-            // Simple bird shape
-            this.ctx.beginPath();
-            this.ctx.moveTo(birdX - 8, birdY);
-            this.ctx.quadraticCurveTo(birdX - 4, birdY - 4, birdX, birdY);
-            this.ctx.quadraticCurveTo(birdX + 4, birdY - 4, birdX + 8, birdY);
-            this.ctx.stroke();
-        }
-        
-        this.ctx.restore();
-    }
-    
-    drawFaceCutout(centerX, centerY, faceWidth, faceHeight) {
-        // Save the current state
-        this.ctx.save();
-        
-        // Create an oval mask for the face area
-        this.ctx.globalCompositeOperation = 'destination-out';
-        
-        // Clear the face area to show the original video
-        this.ctx.beginPath();
-        this.ctx.ellipse(centerX, centerY, faceWidth * 0.5, faceHeight * 0.45, 0, 0, 2 * Math.PI);
-        this.ctx.fill();
-        
-        // Reset composite operation
-        this.ctx.globalCompositeOperation = 'source-over';
-        
-        // Now draw the original video frame only in the face area
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.ellipse(centerX, centerY, faceWidth * 0.5, faceHeight * 0.45, 0, 0, 2 * Math.PI);
-        this.ctx.clip();
-        
-        // Draw the original video in the clipped area
-        this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-        
-        this.ctx.restore();
-        
-        // Add a subtle border around the face cutout
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.ellipse(centerX, centerY, faceWidth * 0.5, faceHeight * 0.45, 0, 0, 2 * Math.PI);
-        this.ctx.stroke();
-        
-        this.ctx.restore();
-    }
-    
-    drawAngryFace(landmarks) {
-        // Get key face landmarks
-        const forehead = this.getLandmarkPoint(landmarks, 10);
-        const leftEye = this.getLandmarkPoint(landmarks, 33);
-        const rightEye = this.getLandmarkPoint(landmarks, 263);
-        const leftEyebrow = this.getLandmarkPoint(landmarks, 70);
-        const rightEyebrow = this.getLandmarkPoint(landmarks, 300);
-        const nose = this.getLandmarkPoint(landmarks, 1);
-        const mouth = this.getLandmarkPoint(landmarks, 13);
-        const leftCheek = this.getLandmarkPoint(landmarks, 116);
-        const rightCheek = this.getLandmarkPoint(landmarks, 345);
-        
-        // Calculate dimensions
-        const eyeDistance = Math.abs(rightEye.x - leftEye.x);
-        const faceWidth = eyeDistance * 2;
-        
-        // Draw thick angry eyebrows
-        this.drawAngryEyebrows(landmarks, eyeDistance);
-        
-        // Draw furrowed angry brow lines
-        this.drawFurrowedBrow(landmarks, eyeDistance);
-        
-        // Draw angry steam from head
-        this.drawAngrySteem(landmarks, faceWidth);
-        
-        // Draw angry mouth lines/gritted teeth effect
-        this.drawAngryMouth(landmarks, eyeDistance);
-        
-        // Draw angry red cheeks/face flush
-        this.drawAngryFlush(landmarks, faceWidth);
-        
-        // Draw angry vein on forehead
-        this.drawAngryVein(landmarks, eyeDistance);
-        
-        // Draw angry fire effects
-        this.drawAngryFire(landmarks, faceWidth);
-    }
-    
-    drawAngryEyebrows(landmarks, eyeDistance) {
-        const leftEye = this.getLandmarkPoint(landmarks, 33);
-        const rightEye = this.getLandmarkPoint(landmarks, 263);
-        const leftEyebrow = this.getLandmarkPoint(landmarks, 70);
-        const rightEyebrow = this.getLandmarkPoint(landmarks, 300);
-        
-        const browThickness = eyeDistance * 0.15;
-        const browLength = eyeDistance * 0.8;
-        
-        // Dark angry brown color
-        this.ctx.fillStyle = '#2F1B14';
-        this.ctx.strokeStyle = '#1A0F0A';
-        this.ctx.lineWidth = 2;
-        
-        // Left angry eyebrow (angled downward toward center)
-        this.ctx.beginPath();
-        this.ctx.moveTo(leftEye.x - browLength * 0.6, leftEyebrow.y - browThickness * 0.5);
-        this.ctx.lineTo(leftEye.x + browLength * 0.2, leftEyebrow.y - browThickness * 2); // Angled down
-        this.ctx.lineTo(leftEye.x + browLength * 0.3, leftEyebrow.y - browThickness * 1.5);
-        this.ctx.lineTo(leftEye.x - browLength * 0.5, leftEyebrow.y + browThickness * 0.5);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Right angry eyebrow (angled downward toward center)
-        this.ctx.beginPath();
-        this.ctx.moveTo(rightEye.x + browLength * 0.6, rightEyebrow.y - browThickness * 0.5);
-        this.ctx.lineTo(rightEye.x - browLength * 0.2, rightEyebrow.y - browThickness * 2); // Angled down
-        this.ctx.lineTo(rightEye.x - browLength * 0.3, rightEyebrow.y - browThickness * 1.5);
-        this.ctx.lineTo(rightEye.x + browLength * 0.5, rightEyebrow.y + browThickness * 0.5);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Add extra angry brow hair details
-        this.ctx.strokeStyle = '#2F1B14';
-        this.ctx.lineWidth = 3;
-        this.ctx.lineCap = 'round';
-        
-        // Left brow hair strokes
-        for (let i = 0; i < 8; i++) {
-            const hairX = leftEye.x - browLength * 0.5 + (browLength * 0.6 / 7) * i;
-            const hairY1 = leftEyebrow.y - browThickness * 0.3;
-            const hairY2 = leftEyebrow.y + browThickness * 0.3;
-            const angleOffset = (i - 4) * 0.1;
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(hairX, hairY1);
-            this.ctx.lineTo(hairX + Math.sin(angleOffset) * 8, hairY2);
-            this.ctx.stroke();
-        }
-        
-        // Right brow hair strokes
-        for (let i = 0; i < 8; i++) {
-            const hairX = rightEye.x + browLength * 0.5 - (browLength * 0.6 / 7) * i;
-            const hairY1 = rightEyebrow.y - browThickness * 0.3;
-            const hairY2 = rightEyebrow.y + browThickness * 0.3;
-            const angleOffset = (i - 4) * -0.1;
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(hairX, hairY1);
-            this.ctx.lineTo(hairX + Math.sin(angleOffset) * 8, hairY2);
-            this.ctx.stroke();
-        }
-    }
-    
-    drawFurrowedBrow(landmarks, eyeDistance) {
-        const forehead = this.getLandmarkPoint(landmarks, 10);
-        const leftEye = this.getLandmarkPoint(landmarks, 33);
-        const rightEye = this.getLandmarkPoint(landmarks, 263);
-        
-        // Dark lines for furrowed brow
-        this.ctx.strokeStyle = '#8B4513';
-        this.ctx.lineWidth = 4;
-        this.ctx.lineCap = 'round';
-        
-        // Center frown line (deepest)
-        this.ctx.beginPath();
-        this.ctx.moveTo(forehead.x, forehead.y - eyeDistance * 0.1);
-        this.ctx.lineTo(forehead.x, forehead.y + eyeDistance * 0.3);
-        this.ctx.stroke();
-        
-        // Left frown line
-        this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        this.ctx.moveTo(forehead.x - eyeDistance * 0.15, forehead.y);
-        this.ctx.lineTo(forehead.x - eyeDistance * 0.1, forehead.y + eyeDistance * 0.25);
-        this.ctx.stroke();
-        
-        // Right frown line
-        this.ctx.beginPath();
-        this.ctx.moveTo(forehead.x + eyeDistance * 0.15, forehead.y);
-        this.ctx.lineTo(forehead.x + eyeDistance * 0.1, forehead.y + eyeDistance * 0.25);
-        this.ctx.stroke();
-        
-        // Additional wrinkle lines
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeStyle = '#A0522D';
-        
-        for (let i = 0; i < 3; i++) {
-            const offset = (i - 1) * eyeDistance * 0.2;
-            this.ctx.beginPath();
-            this.ctx.moveTo(forehead.x + offset - eyeDistance * 0.1, forehead.y - eyeDistance * 0.05);
-            this.ctx.lineTo(forehead.x + offset + eyeDistance * 0.1, forehead.y + eyeDistance * 0.15);
-            this.ctx.stroke();
-        }
-    }
-    
-    drawAngrySteem(landmarks, faceWidth) {
-        const forehead = this.getLandmarkPoint(landmarks, 10);
-        const time = Date.now() * 0.005;
-        
-        // Draw animated steam coming from head
-        this.ctx.strokeStyle = '#DCDCDC';
-        this.ctx.lineWidth = 6;
-        this.ctx.lineCap = 'round';
-        
-        // Multiple steam lines
-        for (let i = 0; i < 6; i++) {
-            const steamX = forehead.x + (i - 2.5) * (faceWidth * 0.1);
-            const steamStartY = forehead.y - faceWidth * 0.3;
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(steamX, steamStartY);
-            
-            // Wavy steam effect
-            for (let j = 1; j <= 8; j++) {
-                const waveX = steamX + Math.sin(time + i + j * 0.5) * (j * 2);
-                const waveY = steamStartY - j * 8;
-                this.ctx.lineTo(waveX, waveY);
-            }
-            this.ctx.stroke();
-        }
-        
-        // Add steam puffs
-        this.ctx.fillStyle = 'rgba(220, 220, 220, 0.6)';
-        for (let i = 0; i < 4; i++) {
-            const puffX = forehead.x + (i - 1.5) * (faceWidth * 0.15) + Math.sin(time + i) * 5;
-            const puffY = forehead.y - faceWidth * 0.4 - Math.sin(time * 2 + i) * 10;
-            const puffSize = 8 + Math.sin(time * 3 + i) * 3;
-            
-            this.ctx.beginPath();
-            this.ctx.arc(puffX, puffY, puffSize, 0, 2 * Math.PI);
-            this.ctx.fill();
-        }
-    }
-    
-    drawAngryMouth(landmarks, eyeDistance) {
-        const mouth = this.getLandmarkPoint(landmarks, 13);
-        const leftMouth = this.getLandmarkPoint(landmarks, 61);
-        const rightMouth = this.getLandmarkPoint(landmarks, 291);
-        
-        // Angry gritted teeth lines
-        this.ctx.strokeStyle = '#8B4513';
-        this.ctx.lineWidth = 3;
-        this.ctx.lineCap = 'round';
-        
-        // Downward mouth lines (angry frown)
-        this.ctx.beginPath();
-        this.ctx.moveTo(leftMouth.x, leftMouth.y);
-        this.ctx.quadraticCurveTo(mouth.x, mouth.y + eyeDistance * 0.2, rightMouth.x, rightMouth.y);
-        this.ctx.stroke();
-        
-        // Gritted teeth lines
-        const mouthWidth = Math.abs(rightMouth.x - leftMouth.x);
-        for (let i = 0; i < 6; i++) {
-            const teethX = leftMouth.x + (mouthWidth / 5) * i;
-            this.ctx.beginPath();
-            this.ctx.moveTo(teethX, mouth.y - 5);
-            this.ctx.lineTo(teethX, mouth.y + 5);
-            this.ctx.stroke();
-        }
-        
-        // Angry mouth corner lines
-        this.ctx.lineWidth = 4;
-        
-        // Left corner
-        this.ctx.beginPath();
-        this.ctx.moveTo(leftMouth.x - eyeDistance * 0.1, leftMouth.y - eyeDistance * 0.05);
-        this.ctx.lineTo(leftMouth.x, leftMouth.y + eyeDistance * 0.05);
-        this.ctx.stroke();
-        
-        // Right corner
-        this.ctx.beginPath();
-        this.ctx.moveTo(rightMouth.x + eyeDistance * 0.1, rightMouth.y - eyeDistance * 0.05);
-        this.ctx.lineTo(rightMouth.x, rightMouth.y + eyeDistance * 0.05);
-        this.ctx.stroke();
-    }
-    
-    drawAngryFlush(landmarks, faceWidth) {
-        const leftCheek = this.getLandmarkPoint(landmarks, 116);
-        const rightCheek = this.getLandmarkPoint(landmarks, 345);
-        
-        // Red angry flush on cheeks
-        this.ctx.fillStyle = 'rgba(255, 69, 69, 0.6)';
-        
-        // Left cheek flush
-        this.ctx.beginPath();
-        this.ctx.ellipse(leftCheek.x - faceWidth * 0.1, leftCheek.y, faceWidth * 0.15, faceWidth * 0.1, 0, 0, 2 * Math.PI);
-        this.ctx.fill();
-        
-        // Right cheek flush
-        this.ctx.beginPath();
-        this.ctx.ellipse(rightCheek.x + faceWidth * 0.1, rightCheek.y, faceWidth * 0.15, faceWidth * 0.1, 0, 0, 2 * Math.PI);
-        this.ctx.fill();
-        
-        // Additional angry red around eyes
-        this.ctx.fillStyle = 'rgba(255, 100, 100, 0.3)';
-        const leftEye = this.getLandmarkPoint(landmarks, 33);
-        const rightEye = this.getLandmarkPoint(landmarks, 263);
-        
-        // Left eye area
-        this.ctx.beginPath();
-        this.ctx.ellipse(leftEye.x, leftEye.y, faceWidth * 0.12, faceWidth * 0.08, 0, 0, 2 * Math.PI);
-        this.ctx.fill();
-        
-        // Right eye area
-        this.ctx.beginPath();
-        this.ctx.ellipse(rightEye.x, rightEye.y, faceWidth * 0.12, faceWidth * 0.08, 0, 0, 2 * Math.PI);
-        this.ctx.fill();
-    }
-    
-    drawAngryVein(landmarks, eyeDistance) {
-        const forehead = this.getLandmarkPoint(landmarks, 10);
-        const time = Date.now() * 0.01;
-        
-        // Pulsating angry vein on forehead
-        const veinIntensity = Math.sin(time * 3) * 0.5 + 1;
-        this.ctx.strokeStyle = `rgba(139, 0, 0, ${0.7 * veinIntensity})`;
-        this.ctx.lineWidth = 4 * veinIntensity;
-        this.ctx.lineCap = 'round';
-        
-        // Main vein line
-        this.ctx.beginPath();
-        this.ctx.moveTo(forehead.x - eyeDistance * 0.2, forehead.y - eyeDistance * 0.15);
-        this.ctx.quadraticCurveTo(
-            forehead.x - eyeDistance * 0.05, 
-            forehead.y - eyeDistance * 0.25,
-            forehead.x + eyeDistance * 0.1, 
-            forehead.y - eyeDistance * 0.1
-        );
-        this.ctx.stroke();
-        
-        // Branch veins
-        this.ctx.lineWidth = 2 * veinIntensity;
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(forehead.x - eyeDistance * 0.1, forehead.y - eyeDistance * 0.2);
-        this.ctx.lineTo(forehead.x - eyeDistance * 0.15, forehead.y - eyeDistance * 0.3);
-        this.ctx.stroke();
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(forehead.x + eyeDistance * 0.05, forehead.y - eyeDistance * 0.15);
-        this.ctx.lineTo(forehead.x + eyeDistance * 0.1, forehead.y - eyeDistance * 0.25);
-        this.ctx.stroke();
-    }
-    
-    drawAngryFire(landmarks, faceWidth) {
-        const forehead = this.getLandmarkPoint(landmarks, 10);
-        const time = Date.now() * 0.008;
-        
-        // Animated fire around the head for extreme anger
-        const fireColors = ['#FF4500', '#FF6347', '#FF8C00', '#FFD700'];
-        
-        for (let i = 0; i < 12; i++) {
-            const angle = (i * Math.PI * 2) / 12 + time;
-            const radius = faceWidth * 0.6 + Math.sin(time * 4 + i) * 10;
-            const fireX = forehead.x + Math.cos(angle) * radius;
-            const fireY = forehead.y + Math.sin(angle) * radius * 0.8;
-            
-            const colorIndex = Math.floor(Math.sin(time * 2 + i) * 2 + 2) % fireColors.length;
-            this.ctx.fillStyle = fireColors[colorIndex];
-            
-            // Flame shape
-            const flameHeight = 15 + Math.sin(time * 6 + i) * 8;
-            const flameWidth = 8 + Math.sin(time * 4 + i) * 4;
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(fireX, fireY);
-            this.ctx.quadraticCurveTo(fireX - flameWidth, fireY - flameHeight * 0.6, fireX, fireY - flameHeight);
-            this.ctx.quadraticCurveTo(fireX + flameWidth, fireY - flameHeight * 0.6, fireX, fireY);
-            this.ctx.fill();
-        }
-        
-        // Add angry sparks
-        this.ctx.fillStyle = '#FFFF00';
-        for (let i = 0; i < 8; i++) {
-            const sparkX = forehead.x + Math.sin(time * 5 + i) * faceWidth * 0.8;
-            const sparkY = forehead.y + Math.cos(time * 4 + i) * faceWidth * 0.6;
-            const sparkSize = 2 + Math.sin(time * 8 + i) * 2;
-            
-            this.ctx.beginPath();
-            this.ctx.arc(sparkX, sparkY, sparkSize, 0, 2 * Math.PI);
-            this.ctx.fill();
-        }
-    }
-    
-    drawArmyGear(landmarks) {
+    drawAlienInvasion(landmarks) {
         // Get key face landmarks
         const forehead = this.getLandmarkPoint(landmarks, 10);
         const leftEye = this.getLandmarkPoint(landmarks, 33);
         const rightEye = this.getLandmarkPoint(landmarks, 263);
         const nose = this.getLandmarkPoint(landmarks, 1);
-        const mouth = this.getLandmarkPoint(landmarks, 13);
         const chin = this.getLandmarkPoint(landmarks, 175);
-        const leftTemple = this.getLandmarkPoint(landmarks, 127);
-        const rightTemple = this.getLandmarkPoint(landmarks, 356);
-        const leftCheek = this.getLandmarkPoint(landmarks, 116);
-        const rightCheek = this.getLandmarkPoint(landmarks, 345);
         
         // Calculate dimensions
         const eyeDistance = Math.abs(rightEye.x - leftEye.x);
         const faceWidth = eyeDistance * 2;
         const faceHeight = Math.abs(chin.y - forehead.y);
         
-        // Draw combat helmet
-        this.drawCombatHelmet(landmarks, faceWidth, faceHeight);
+        // Draw alien green skin overlay
+        this.drawAlienSkin(landmarks, faceWidth, faceHeight);
         
-        // Draw camouflage face paint
-        this.drawCamoFacePaint(landmarks, faceWidth, faceHeight);
+        // Draw huge alien eyes
+        this.drawAlienEyes(landmarks, eyeDistance);
         
-        // Draw dog tags
-        this.drawDogTags(landmarks, faceWidth);
+        // Draw UFO above head
+        this.drawUFO(landmarks, faceWidth);
         
-        // Draw military uniform collar
-        this.drawMilitaryCollar(landmarks, faceWidth, faceHeight);
+        // Draw tractor beam effect
+        this.drawTractorBeam(landmarks, faceWidth, faceHeight);
         
-        // Draw military rank insignia
-        this.drawMilitaryRank(landmarks, faceWidth);
-        
-        // Draw tactical gear
-        this.drawTacticalGear(landmarks, faceWidth);
+        // Draw alien text
+        this.drawAlienText(landmarks, faceWidth);
     }
     
-    drawCombatHelmet(landmarks, faceWidth, faceHeight) {
+    drawAlienSkin(landmarks, faceWidth, faceHeight) {
         const forehead = this.getLandmarkPoint(landmarks, 10);
-        const leftTemple = this.getLandmarkPoint(landmarks, 127);
-        const rightTemple = this.getLandmarkPoint(landmarks, 356);
+        const chin = this.getLandmarkPoint(landmarks, 175);
         
-        // Army green helmet colors
-        this.ctx.fillStyle = '#4F5D2F'; // Army green
-        this.ctx.strokeStyle = '#3C4A25';
-        this.ctx.lineWidth = 3;
-        
-        // Main helmet shape (covers most of head)
+        // Green alien skin overlay
+        this.ctx.fillStyle = 'rgba(100, 200, 100, 0.6)';
         this.ctx.beginPath();
-        this.ctx.arc(
-            forehead.x, 
-            forehead.y - faceHeight * 0.2, 
-            faceWidth * 0.75, 
-            0.1 * Math.PI, 
-            0.9 * Math.PI
-        );
-        this.ctx.closePath();
+        this.ctx.ellipse(forehead.x, forehead.y + faceHeight * 0.2, faceWidth * 0.6, faceHeight * 0.8, 0, 0, 2 * Math.PI);
         this.ctx.fill();
-        this.ctx.stroke();
         
-        // Helmet rim/edge
-        this.ctx.fillStyle = '#3C4A25';
-        this.ctx.beginPath();
-        this.ctx.ellipse(
-            forehead.x, 
-            forehead.y + faceHeight * 0.02, 
-            faceWidth * 0.55, 
-            faceHeight * 0.08, 
-            0, 0, Math.PI
-        );
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Helmet camouflage pattern
-        this.ctx.fillStyle = '#2F3B1F';
-        for (let i = 0; i < 12; i++) {
-            const cameX = forehead.x + (Math.random() - 0.5) * faceWidth * 1.2;
-            const cameY = forehead.y - faceHeight * 0.4 + Math.random() * faceHeight * 0.6;
-            const cameSize = 8 + Math.random() * 12;
-            
-            this.ctx.beginPath();
-            this.ctx.arc(cameX, cameY, cameSize, 0, 2 * Math.PI);
-            this.ctx.fill();
-        }
-        
-        // Helmet chin strap
-        this.ctx.strokeStyle = '#654321';
-        this.ctx.lineWidth = 6;
-        this.ctx.lineCap = 'round';
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(leftTemple.x - faceWidth * 0.05, leftTemple.y + faceHeight * 0.25);
-        this.ctx.quadraticCurveTo(
-            forehead.x, 
-            leftTemple.y + faceHeight * 0.45,
-            rightTemple.x + faceWidth * 0.05, 
-            rightTemple.y + faceHeight * 0.25
-        );
-        this.ctx.stroke();
-        
-        // Helmet night vision goggle mount
-        this.ctx.fillStyle = '#2F2F2F';
-        this.ctx.strokeStyle = '#1C1C1C';
-        this.ctx.lineWidth = 2;
-        
-        this.ctx.beginPath();
-        this.ctx.rect(forehead.x - faceWidth * 0.08, forehead.y - faceHeight * 0.35, faceWidth * 0.16, faceHeight * 0.08);
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Side helmet buckles
-        this.ctx.fillStyle = '#8B7355';
-        
-        // Left buckle
-        this.ctx.beginPath();
-        this.ctx.rect(leftTemple.x - faceWidth * 0.08, leftTemple.y + faceHeight * 0.15, faceWidth * 0.06, faceHeight * 0.04);
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Right buckle
-        this.ctx.beginPath();
-        this.ctx.rect(rightTemple.x + faceWidth * 0.02, rightTemple.y + faceHeight * 0.15, faceWidth * 0.06, faceHeight * 0.04);
-        this.ctx.fill();
-        this.ctx.stroke();
-    }
-    
-    drawCamoFacePaint(landmarks, faceWidth, faceHeight) {
-        const leftCheek = this.getLandmarkPoint(landmarks, 116);
-        const rightCheek = this.getLandmarkPoint(landmarks, 345);
-        const forehead = this.getLandmarkPoint(landmarks, 10);
-        const nose = this.getLandmarkPoint(landmarks, 1);
-        
-        // Military face paint colors
-        const camoColors = ['#4F5D2F', '#2F3B1F', '#1C2812', '#654321'];
-        
-        // Face paint stripes and patterns
-        this.ctx.lineWidth = 8;
-        this.ctx.lineCap = 'round';
-        
-        // Horizontal stripes on forehead
-        for (let i = 0; i < 3; i++) {
-            this.ctx.strokeStyle = camoColors[i % camoColors.length];
-            const stripeY = forehead.y + i * (faceHeight * 0.08);
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(forehead.x - faceWidth * 0.3, stripeY);
-            this.ctx.lineTo(forehead.x + faceWidth * 0.3, stripeY);
-            this.ctx.stroke();
-        }
-        
-        // Diagonal stripes on cheeks
-        this.ctx.lineWidth = 6;
-        
-        // Left cheek stripes
-        for (let i = 0; i < 4; i++) {
-            this.ctx.strokeStyle = camoColors[i % camoColors.length];
-            const startX = leftCheek.x - faceWidth * 0.15;
-            const startY = leftCheek.y - faceHeight * 0.1 + i * (faceHeight * 0.06);
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(startX, startY);
-            this.ctx.lineTo(startX + faceWidth * 0.2, startY + faceHeight * 0.08);
-            this.ctx.stroke();
-        }
-        
-        // Right cheek stripes
-        for (let i = 0; i < 4; i++) {
-            this.ctx.strokeStyle = camoColors[i % camoColors.length];
-            const startX = rightCheek.x + faceWidth * 0.15;
-            const startY = rightCheek.y - faceHeight * 0.1 + i * (faceHeight * 0.06);
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(startX, startY);
-            this.ctx.lineTo(startX - faceWidth * 0.2, startY + faceHeight * 0.08);
-            this.ctx.stroke();
-        }
-        
-        // Nose camo stripe
-        this.ctx.strokeStyle = camoColors[2];
-        this.ctx.lineWidth = 4;
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(nose.x, nose.y - faceHeight * 0.05);
-        this.ctx.lineTo(nose.x, nose.y + faceHeight * 0.1);
-        this.ctx.stroke();
-        
-        // Random camo spots
+        // Alien texture spots
+        this.ctx.fillStyle = 'rgba(80, 180, 80, 0.4)';
         for (let i = 0; i < 8; i++) {
-            this.ctx.fillStyle = camoColors[i % camoColors.length];
             const spotX = forehead.x + (Math.random() - 0.5) * faceWidth * 0.8;
-            const spotY = forehead.y + (Math.random() - 0.2) * faceHeight * 0.6;
-            const spotSize = 3 + Math.random() * 5;
+            const spotY = forehead.y + (Math.random() - 0.2) * faceHeight * 0.8;
+            const spotSize = 5 + Math.random() * 8;
             
             this.ctx.beginPath();
             this.ctx.arc(spotX, spotY, spotSize, 0, 2 * Math.PI);
@@ -3833,156 +3133,137 @@ class WebcamFilters {
         }
     }
     
-    drawDogTags(landmarks, faceWidth) {
-        const chin = this.getLandmarkPoint(landmarks, 175);
-        const neck = { x: chin.x, y: chin.y + faceWidth * 0.3 };
+    drawAlienEyes(landmarks, eyeDistance) {
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
         
-        // Dog tag chain
-        this.ctx.strokeStyle = '#C0C0C0';
+        const alienEyeSize = eyeDistance * 0.8;
+        
+        // Giant black alien eyes
+        this.ctx.fillStyle = '#000000';
+        this.ctx.strokeStyle = '#333333';
         this.ctx.lineWidth = 3;
         
+        // Left alien eye
         this.ctx.beginPath();
-        this.ctx.moveTo(neck.x - faceWidth * 0.1, neck.y - faceWidth * 0.2);
-        this.ctx.quadraticCurveTo(neck.x, neck.y - faceWidth * 0.15, neck.x + faceWidth * 0.1, neck.y - faceWidth * 0.2);
+        this.ctx.ellipse(leftEye.x, leftEye.y, alienEyeSize * 0.6, alienEyeSize * 0.8, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
         this.ctx.stroke();
         
-        // Dog tags
+        // Right alien eye
+        this.ctx.beginPath();
+        this.ctx.ellipse(rightEye.x, rightEye.y, alienEyeSize * 0.6, alienEyeSize * 0.8, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Alien eye reflections
+        this.ctx.fillStyle = '#FFFFFF';
+        
+        // Left eye reflection
+        this.ctx.beginPath();
+        this.ctx.ellipse(leftEye.x - alienEyeSize * 0.2, leftEye.y - alienEyeSize * 0.3, alienEyeSize * 0.15, alienEyeSize * 0.2, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Right eye reflection
+        this.ctx.beginPath();
+        this.ctx.ellipse(rightEye.x - alienEyeSize * 0.2, rightEye.y - alienEyeSize * 0.3, alienEyeSize * 0.15, alienEyeSize * 0.2, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+    }
+    
+    drawUFO(landmarks, faceWidth) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const ufoY = forehead.y - faceWidth * 0.8;
+        const time = Date.now() * 0.003;
+        
+        // UFO body
         this.ctx.fillStyle = '#C0C0C0';
-        this.ctx.strokeStyle = '#A0A0A0';
-        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = '#808080';
+        this.ctx.lineWidth = 3;
         
-        // First dog tag
+        // UFO dome
         this.ctx.beginPath();
-        this.ctx.rect(neck.x - faceWidth * 0.04, neck.y - faceWidth * 0.05, faceWidth * 0.08, faceWidth * 0.12);
+        this.ctx.arc(forehead.x, ufoY, faceWidth * 0.3, 0, Math.PI, true);
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Second dog tag (slightly offset)
+        // UFO base
         this.ctx.beginPath();
-        this.ctx.rect(neck.x - faceWidth * 0.02, neck.y + faceWidth * 0.02, faceWidth * 0.08, faceWidth * 0.12);
+        this.ctx.ellipse(forehead.x, ufoY, faceWidth * 0.5, faceWidth * 0.15, 0, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Dog tag text
-        this.ctx.fillStyle = '#000';
-        this.ctx.font = `${Math.floor(faceWidth * 0.02)}px monospace`;
-        this.ctx.textAlign = 'center';
-        
-        this.ctx.fillText('SOLDIER', neck.x, neck.y);
-        this.ctx.fillText('US ARMY', neck.x + faceWidth * 0.02, neck.y + faceWidth * 0.08);
-    }
-    
-    drawMilitaryCollar(landmarks, faceWidth, faceHeight) {
-        const chin = this.getLandmarkPoint(landmarks, 175);
-        const neck = { x: chin.x, y: chin.y + faceHeight * 0.3 };
-        
-        // Military uniform collar
-        this.ctx.fillStyle = '#4F5D2F';
-        this.ctx.strokeStyle = '#3C4A25';
-        this.ctx.lineWidth = 2;
-        
-        // Left collar
-        this.ctx.beginPath();
-        this.ctx.moveTo(neck.x - faceWidth * 0.3, neck.y + faceHeight * 0.1);
-        this.ctx.lineTo(neck.x - faceWidth * 0.15, neck.y - faceHeight * 0.05);
-        this.ctx.lineTo(neck.x - faceWidth * 0.05, neck.y + faceHeight * 0.05);
-        this.ctx.lineTo(neck.x - faceWidth * 0.25, neck.y + faceHeight * 0.2);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Right collar
-        this.ctx.beginPath();
-        this.ctx.moveTo(neck.x + faceWidth * 0.3, neck.y + faceHeight * 0.1);
-        this.ctx.lineTo(neck.x + faceWidth * 0.15, neck.y - faceHeight * 0.05);
-        this.ctx.lineTo(neck.x + faceWidth * 0.05, neck.y + faceHeight * 0.05);
-        this.ctx.lineTo(neck.x + faceWidth * 0.25, neck.y + faceHeight * 0.2);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-    }
-    
-    drawMilitaryRank(landmarks, faceWidth) {
-        const chin = this.getLandmarkPoint(landmarks, 175);
-        const leftShoulder = { x: chin.x - faceWidth * 0.25, y: chin.y + faceWidth * 0.4 };
-        
-        // Sergeant stripes
-        this.ctx.fillStyle = '#FFD700';
-        this.ctx.strokeStyle = '#B8860B';
-        this.ctx.lineWidth = 1;
-        
-        for (let i = 0; i < 3; i++) {
-            // Chevron stripes
-            const stripeY = leftShoulder.y - faceWidth * 0.05 + i * faceWidth * 0.04;
+        // UFO lights
+        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'];
+        for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3 + time;
+            const lightX = forehead.x + Math.cos(angle) * faceWidth * 0.4;
+            const lightY = ufoY;
             
+            this.ctx.fillStyle = colors[i % colors.length];
             this.ctx.beginPath();
-            this.ctx.moveTo(leftShoulder.x - faceWidth * 0.06, stripeY);
-            this.ctx.lineTo(leftShoulder.x, stripeY - faceWidth * 0.02);
-            this.ctx.lineTo(leftShoulder.x + faceWidth * 0.06, stripeY);
-            this.ctx.lineTo(leftShoulder.x + faceWidth * 0.04, stripeY + faceWidth * 0.015);
-            this.ctx.lineTo(leftShoulder.x, stripeY - faceWidth * 0.005);
-            this.ctx.lineTo(leftShoulder.x - faceWidth * 0.04, stripeY + faceWidth * 0.015);
-            this.ctx.closePath();
+            this.ctx.arc(lightX, lightY, 5, 0, 2 * Math.PI);
             this.ctx.fill();
-            this.ctx.stroke();
         }
     }
     
-    drawTacticalGear(landmarks, faceWidth) {
-        const chin = this.getLandmarkPoint(landmarks, 175);
-        const chest = { x: chin.x, y: chin.y + faceWidth * 0.5 };
+    drawTractorBeam(landmarks, faceWidth, faceHeight) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const ufoY = forehead.y - faceWidth * 0.8;
         
-        // Tactical vest outline
-        this.ctx.strokeStyle = '#2F2F2F';
-        this.ctx.lineWidth = 4;
+        // Tractor beam
+        this.ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+        this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.6)';
+        this.ctx.lineWidth = 3;
         
         this.ctx.beginPath();
-        this.ctx.rect(chest.x - faceWidth * 0.3, chest.y, faceWidth * 0.6, faceWidth * 0.4);
-        this.ctx.stroke();
-        
-        // Tactical pouches
-        this.ctx.fillStyle = '#2F2F2F';
-        this.ctx.strokeStyle = '#1C1C1C';
-        this.ctx.lineWidth = 1;
-        
-        // Left pouch
-        this.ctx.beginPath();
-        this.ctx.rect(chest.x - faceWidth * 0.25, chest.y + faceWidth * 0.05, faceWidth * 0.08, faceWidth * 0.12);
+        this.ctx.moveTo(forehead.x - faceWidth * 0.3, ufoY);
+        this.ctx.lineTo(forehead.x - faceWidth * 0.5, forehead.y + faceHeight * 0.5);
+        this.ctx.lineTo(forehead.x + faceWidth * 0.5, forehead.y + faceHeight * 0.5);
+        this.ctx.lineTo(forehead.x + faceWidth * 0.3, ufoY);
+        this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Center pouch
-        this.ctx.beginPath();
-        this.ctx.rect(chest.x - faceWidth * 0.04, chest.y + faceWidth * 0.05, faceWidth * 0.08, faceWidth * 0.12);
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Right pouch
-        this.ctx.beginPath();
-        this.ctx.rect(chest.x + faceWidth * 0.17, chest.y + faceWidth * 0.05, faceWidth * 0.08, faceWidth * 0.12);
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Radio on shoulder
-        this.ctx.fillStyle = '#1C1C1C';
-        const rightShoulder = { x: chin.x + faceWidth * 0.25, y: chin.y + faceWidth * 0.35 };
-        
-        this.ctx.beginPath();
-        this.ctx.rect(rightShoulder.x, rightShoulder.y, faceWidth * 0.06, faceWidth * 0.1);
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Radio antenna
-        this.ctx.strokeStyle = '#C0C0C0';
-        this.ctx.lineWidth = 2;
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(rightShoulder.x + faceWidth * 0.03, rightShoulder.y);
-        this.ctx.lineTo(rightShoulder.x + faceWidth * 0.03, rightShoulder.y - faceWidth * 0.08);
-        this.ctx.stroke();
+        // Beam particles
+        const time = Date.now() * 0.01;
+        this.ctx.fillStyle = '#FFFF00';
+        for (let i = 0; i < 15; i++) {
+            const particleX = forehead.x + (Math.random() - 0.5) * faceWidth * 0.8;
+            const particleY = forehead.y + Math.sin(time + i) * faceHeight * 0.3;
+            const particleSize = 2 + Math.sin(time * 2 + i) * 2;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(particleX, particleY, particleSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
     }
     
-    drawMedievalKnight(landmarks) {
+    drawAlienText(landmarks, faceWidth) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const time = Date.now() * 0.005;
+        
+        // Alien language text
+        this.ctx.font = `bold ${Math.floor(faceWidth * 0.08)}px Arial`;
+        this.ctx.fillStyle = `hsl(${(time * 100) % 360}, 100%, 50%)`;
+        this.ctx.textAlign = 'center';
+        
+        const alienTexts = ['▲◆●◄', '☰☱☲☳', '⟐⟑⟒⟓'];
+        
+        for (let i = 0; i < alienTexts.length; i++) {
+            const textAngle = time * 2 + i * Math.PI / 1.5;
+            const textRadius = faceWidth * 0.6;
+            const textX = forehead.x + Math.cos(textAngle) * textRadius;
+            const textY = forehead.y + Math.sin(textAngle) * textRadius;
+            
+            this.ctx.save();
+            this.ctx.translate(textX, textY);
+            this.ctx.rotate(time + i);
+            this.ctx.fillText(alienTexts[i], 0, 0);
+            this.ctx.restore();
+        }
+    }
+    
+    drawZombieOutbreak(landmarks) {
         // Get key face landmarks
         const forehead = this.getLandmarkPoint(landmarks, 10);
         const leftEye = this.getLandmarkPoint(landmarks, 33);
@@ -3990,290 +3271,964 @@ class WebcamFilters {
         const nose = this.getLandmarkPoint(landmarks, 1);
         const mouth = this.getLandmarkPoint(landmarks, 13);
         const chin = this.getLandmarkPoint(landmarks, 175);
-        const leftTemple = this.getLandmarkPoint(landmarks, 127);
-        const rightTemple = this.getLandmarkPoint(landmarks, 356);
         
         // Calculate dimensions
         const eyeDistance = Math.abs(rightEye.x - leftEye.x);
         const faceWidth = eyeDistance * 2;
         const faceHeight = Math.abs(chin.y - forehead.y);
         
-        // Draw knight helmet
-        this.drawKnightHelmet(landmarks, faceWidth, faceHeight);
+        // Draw zombie skin
+        this.drawZombieSkin(landmarks, faceWidth, faceHeight);
         
-        // Draw chain mail
-        this.drawChainMail(landmarks, faceWidth, faceHeight);
+        // Draw bloody wounds
+        this.drawBloodyWounds(landmarks, faceWidth, faceHeight);
         
-        // Draw armor breastplate
-        this.drawArmorBreastplate(landmarks, faceWidth);
+        // Draw zombie eyes
+        this.drawZombieEyes(landmarks, eyeDistance);
         
-        // Draw sword
-        this.drawKnightSword(landmarks, faceWidth);
+        // Draw rotten teeth
+        this.drawRottenTeeth(landmarks, eyeDistance);
         
-        // Draw shield
-        this.drawKnightShield(landmarks, faceWidth);
-        
-        // Draw medieval cape
-        this.drawMedievalCape(landmarks, faceWidth, faceHeight);
+        // Draw zombie text
+        this.drawZombieText(landmarks, faceWidth);
     }
     
-    drawKnightHelmet(landmarks, faceWidth, faceHeight) {
+    drawZombieSkin(landmarks, faceWidth, faceHeight) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        
+        // Green-gray zombie skin
+        this.ctx.fillStyle = 'rgba(120, 140, 100, 0.7)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, forehead.y + faceHeight * 0.2, faceWidth * 0.6, faceHeight * 0.8, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Decay spots
+        this.ctx.fillStyle = 'rgba(80, 100, 60, 0.8)';
+        for (let i = 0; i < 12; i++) {
+            const spotX = forehead.x + (Math.random() - 0.5) * faceWidth * 0.8;
+            const spotY = forehead.y + (Math.random() - 0.2) * faceHeight * 0.8;
+            const spotSize = 8 + Math.random() * 15;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(spotX, spotY, spotSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+    }
+    
+    drawBloodyWounds(landmarks, faceWidth, faceHeight) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        
+        // Blood splatters
+        this.ctx.fillStyle = '#8B0000';
+        
+        // Forehead wound
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x - faceWidth * 0.1, forehead.y - faceHeight * 0.1);
+        this.ctx.lineTo(forehead.x + faceWidth * 0.15, forehead.y - faceHeight * 0.05);
+        this.ctx.lineTo(forehead.x + faceWidth * 0.05, forehead.y + faceHeight * 0.05);
+        this.ctx.lineTo(forehead.x - faceWidth * 0.05, forehead.y);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Cheek scratches
+        this.ctx.strokeStyle = '#8B0000';
+        this.ctx.lineWidth = 4;
+        this.ctx.lineCap = 'round';
+        
+        // Left cheek scratch
+        for (let i = 0; i < 3; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(leftCheek.x - faceWidth * 0.1, leftCheek.y - faceHeight * 0.1 + i * faceHeight * 0.04);
+            this.ctx.lineTo(leftCheek.x + faceWidth * 0.05, leftCheek.y + faceHeight * 0.05 + i * faceHeight * 0.04);
+            this.ctx.stroke();
+        }
+        
+        // Blood drips
+        this.ctx.strokeStyle = '#8B0000';
+        this.ctx.lineWidth = 6;
+        
+        for (let i = 0; i < 5; i++) {
+            const dripX = forehead.x + (i - 2) * faceWidth * 0.15;
+            this.ctx.beginPath();
+            this.ctx.moveTo(dripX, forehead.y + faceHeight * 0.1);
+            this.ctx.lineTo(dripX, forehead.y + faceHeight * 0.4 + Math.random() * faceHeight * 0.2);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawZombieEyes(landmarks, eyeDistance) {
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        
+        // Bloodshot zombie eyes
+        this.ctx.fillStyle = '#FFFF00';
+        this.ctx.strokeStyle = '#8B0000';
+        this.ctx.lineWidth = 3;
+        
+        // Left zombie eye
+        this.ctx.beginPath();
+        this.ctx.arc(leftEye.x, leftEye.y, eyeDistance * 0.2, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Right zombie eye
+        this.ctx.beginPath();
+        this.ctx.arc(rightEye.x, rightEye.y, eyeDistance * 0.2, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Bloodshot veins
+        this.ctx.strokeStyle = '#FF0000';
+        this.ctx.lineWidth = 2;
+        
+        for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3;
+            // Left eye veins
+            this.ctx.beginPath();
+            this.ctx.moveTo(leftEye.x, leftEye.y);
+            this.ctx.lineTo(leftEye.x + Math.cos(angle) * eyeDistance * 0.15, leftEye.y + Math.sin(angle) * eyeDistance * 0.15);
+            this.ctx.stroke();
+            
+            // Right eye veins
+            this.ctx.beginPath();
+            this.ctx.moveTo(rightEye.x, rightEye.y);
+            this.ctx.lineTo(rightEye.x + Math.cos(angle) * eyeDistance * 0.15, rightEye.y + Math.sin(angle) * eyeDistance * 0.15);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawRottenTeeth(landmarks, eyeDistance) {
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const leftMouth = this.getLandmarkPoint(landmarks, 61);
+        const rightMouth = this.getLandmarkPoint(landmarks, 291);
+        
+        // Rotten mouth
+        this.ctx.fillStyle = '#2F2F2F';
+        this.ctx.strokeStyle = '#8B0000';
+        this.ctx.lineWidth = 2;
+        
+        this.ctx.beginPath();
+        this.ctx.ellipse(mouth.x, mouth.y, eyeDistance * 0.4, eyeDistance * 0.15, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Missing and rotten teeth
+        this.ctx.fillStyle = '#FFFACD';
+        const mouthWidth = Math.abs(rightMouth.x - leftMouth.x);
+        
+        for (let i = 0; i < 6; i++) {
+            if (i === 2 || i === 4) continue; // Missing teeth
+            
+            const toothX = leftMouth.x + (mouthWidth / 5) * i;
+            const toothHeight = 8 + Math.random() * 5; // Irregular teeth
+            
+            this.ctx.fillStyle = i === 1 ? '#8B4513' : '#FFFACD'; // Brown rotten tooth
+            
+            this.ctx.beginPath();
+            this.ctx.rect(toothX - 3, mouth.y - toothHeight / 2, 6, toothHeight);
+            this.ctx.fill();
+        }
+    }
+    
+    drawZombieText(landmarks, faceWidth) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const time = Date.now() * 0.003;
+        
+        // Zombie groaning text
+        this.ctx.font = `bold ${Math.floor(faceWidth * 0.1)}px Arial`;
+        this.ctx.fillStyle = '#8B0000';
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 2;
+        this.ctx.textAlign = 'center';
+        
+        const zombieTexts = ['BRAINSSS...', 'GRAAAH!', 'URGHHHH'];
+        
+        for (let i = 0; i < zombieTexts.length; i++) {
+            const textAngle = time * 1.5 + i * Math.PI / 1.5;
+            const textRadius = faceWidth * 0.7;
+            const textX = forehead.x + Math.cos(textAngle) * textRadius;
+            const textY = forehead.y + Math.sin(textAngle) * textRadius;
+            
+            this.ctx.save();
+            this.ctx.translate(textX, textY);
+            this.ctx.rotate(Math.sin(time * 3 + i) * 0.3);
+            this.ctx.strokeText(zombieTexts[i], 0, 0);
+            this.ctx.fillText(zombieTexts[i], 0, 0);
+            this.ctx.restore();
+        }
+    }
+    
+    drawCyborgFuture(landmarks) {
+        // Get key face landmarks
         const forehead = this.getLandmarkPoint(landmarks, 10);
         const leftEye = this.getLandmarkPoint(landmarks, 33);
         const rightEye = this.getLandmarkPoint(landmarks, 263);
         const nose = this.getLandmarkPoint(landmarks, 1);
+        const chin = this.getLandmarkPoint(landmarks, 175);
         
-        // Medieval steel helmet colors
-        this.ctx.fillStyle = '#C0C0C0'; // Steel gray
-        this.ctx.strokeStyle = '#808080';
-        this.ctx.lineWidth = 3;
+        // Calculate dimensions
+        const eyeDistance = Math.abs(rightEye.x - leftEye.x);
+        const faceWidth = eyeDistance * 2;
+        const faceHeight = Math.abs(chin.y - forehead.y);
         
-        // Main helmet dome
-        this.ctx.beginPath();
-        this.ctx.arc(
-            forehead.x, 
-            forehead.y - faceHeight * 0.25, 
-            faceWidth * 0.7, 
-            0.15 * Math.PI, 
-            0.85 * Math.PI
-        );
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
+        // Draw metal face plates
+        this.drawMetalPlates(landmarks, faceWidth, faceHeight);
         
-        // Helmet face guard (leaving eye area open)
-        this.ctx.fillStyle = '#A9A9A9';
+        // Draw laser eye
+        this.drawLaserEye(landmarks, eyeDistance);
         
-        // Nose guard
-        this.ctx.beginPath();
-        this.ctx.rect(
-            nose.x - faceWidth * 0.03, 
-            forehead.y - faceHeight * 0.1, 
-            faceWidth * 0.06, 
-            faceHeight * 0.4
-        );
-        this.ctx.fill();
-        this.ctx.stroke();
+        // Draw circuit patterns
+        this.drawCircuitPatterns(landmarks, faceWidth, faceHeight);
         
-        // Side guards (cheek plates)
-        // Left cheek plate
-        this.ctx.beginPath();
-        this.ctx.moveTo(leftEye.x - faceWidth * 0.2, forehead.y);
-        this.ctx.lineTo(leftEye.x - faceWidth * 0.25, forehead.y + faceHeight * 0.3);
-        this.ctx.lineTo(leftEye.x - faceWidth * 0.1, forehead.y + faceHeight * 0.35);
-        this.ctx.lineTo(leftEye.x - faceWidth * 0.05, forehead.y + faceHeight * 0.1);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
+        // Draw glitch effects
+        this.drawGlitchEffects(landmarks, faceWidth, faceHeight);
         
-        // Right cheek plate
-        this.ctx.beginPath();
-        this.ctx.moveTo(rightEye.x + faceWidth * 0.2, forehead.y);
-        this.ctx.lineTo(rightEye.x + faceWidth * 0.25, forehead.y + faceHeight * 0.3);
-        this.ctx.lineTo(rightEye.x + faceWidth * 0.1, forehead.y + faceHeight * 0.35);
-        this.ctx.lineTo(rightEye.x + faceWidth * 0.05, forehead.y + faceHeight * 0.1);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
-        
-        // Helmet plume/crest
-        this.ctx.fillStyle = '#DC143C'; // Dark red
-        this.ctx.strokeStyle = '#8B0000';
-        this.ctx.lineWidth = 2;
-        
-        // Plume feathers
-        for (let i = 0; i < 5; i++) {
-            const plumeX = forehead.x + (i - 2) * (faceWidth * 0.08);
-            const plumeHeight = faceHeight * 0.6 + Math.sin(i) * 20;
-            
-            this.ctx.beginPath();
-            this.ctx.ellipse(
-                plumeX, 
-                forehead.y - faceHeight * 0.4, 
-                faceWidth * 0.02, 
-                plumeHeight * 0.5, 
-                0, 0, 2 * Math.PI
-            );
-            this.ctx.fill();
-            this.ctx.stroke();
-        }
-        
-        // Helmet visor slits
-        this.ctx.fillStyle = '#000';
-        
-        // Left eye slit
-        this.ctx.beginPath();
-        this.ctx.rect(leftEye.x - faceWidth * 0.08, leftEye.y - faceHeight * 0.03, faceWidth * 0.1, faceHeight * 0.02);
-        this.ctx.fill();
-        
-        // Right eye slit
-        this.ctx.beginPath();
-        this.ctx.rect(rightEye.x - faceWidth * 0.02, rightEye.y - faceHeight * 0.03, faceWidth * 0.1, faceHeight * 0.02);
-        this.ctx.fill();
-        
-        // Breathing holes
-        for (let i = 0; i < 4; i++) {
-            this.ctx.beginPath();
-            this.ctx.arc(
-                nose.x + (i - 1.5) * faceWidth * 0.02, 
-                nose.y + faceHeight * 0.1, 
-                2, 
-                0, 2 * Math.PI
-            );
-            this.ctx.fill();
-        }
+        // Draw cyborg text
+        this.drawCyborgText(landmarks, faceWidth);
     }
     
-    drawChainMail(landmarks, faceWidth, faceHeight) {
-        const chin = this.getLandmarkPoint(landmarks, 175);
-        const neck = { x: chin.x, y: chin.y + faceHeight * 0.2 };
+    drawMetalPlates(landmarks, faceWidth, faceHeight) {
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        const forehead = this.getLandmarkPoint(landmarks, 10);
         
-        // Chain mail coif (head covering)
-        this.ctx.fillStyle = '#696969';
-        this.ctx.strokeStyle = '#2F2F2F';
-        this.ctx.lineWidth = 1;
-        
-        // Chain mail pattern using small circles
-        for (let y = neck.y; y < neck.y + faceHeight * 0.6; y += 8) {
-            for (let x = neck.x - faceWidth * 0.4; x < neck.x + faceWidth * 0.4; x += 8) {
-                // Offset every other row for realistic chain mail pattern
-                const offsetX = (Math.floor(y / 8) % 2) * 4;
-                
-                this.ctx.beginPath();
-                this.ctx.arc(x + offsetX, y, 3, 0, 2 * Math.PI);
-                this.ctx.stroke();
-            }
-        }
-        
-        // Chain mail shoulder protection
-        const leftShoulder = { x: chin.x - faceWidth * 0.3, y: chin.y + faceHeight * 0.5 };
-        const rightShoulder = { x: chin.x + faceWidth * 0.3, y: chin.y + faceHeight * 0.5 };
-        
-        // Left shoulder mail
-        for (let y = leftShoulder.y; y < leftShoulder.y + faceHeight * 0.3; y += 6) {
-            for (let x = leftShoulder.x - faceWidth * 0.15; x < leftShoulder.x + faceWidth * 0.1; x += 6) {
-                const offsetX = (Math.floor(y / 6) % 2) * 3;
-                this.ctx.beginPath();
-                this.ctx.arc(x + offsetX, y, 2, 0, 2 * Math.PI);
-                this.ctx.stroke();
-            }
-        }
-        
-        // Right shoulder mail
-        for (let y = rightShoulder.y; y < rightShoulder.y + faceHeight * 0.3; y += 6) {
-            for (let x = rightShoulder.x - faceWidth * 0.1; x < rightShoulder.x + faceWidth * 0.15; x += 6) {
-                const offsetX = (Math.floor(y / 6) % 2) * 3;
-                this.ctx.beginPath();
-                this.ctx.arc(x + offsetX, y, 2, 0, 2 * Math.PI);
-                this.ctx.stroke();
-            }
-        }
-    }
-    
-    drawArmorBreastplate(landmarks, faceWidth) {
-        const chin = this.getLandmarkPoint(landmarks, 175);
-        const chest = { x: chin.x, y: chin.y + faceWidth * 0.6 };
-        
-        // Steel breastplate
+        // Metal face plates
         this.ctx.fillStyle = '#C0C0C0';
         this.ctx.strokeStyle = '#808080';
         this.ctx.lineWidth = 3;
         
-        // Main breastplate shape
+        // Left cheek plate
         this.ctx.beginPath();
-        this.ctx.moveTo(chest.x - faceWidth * 0.25, chest.y);
-        this.ctx.lineTo(chest.x - faceWidth * 0.3, chest.y + faceWidth * 0.4);
-        this.ctx.quadraticCurveTo(chest.x, chest.y + faceWidth * 0.5, chest.x + faceWidth * 0.3, chest.y + faceWidth * 0.4);
-        this.ctx.lineTo(chest.x + faceWidth * 0.25, chest.y);
+        this.ctx.moveTo(leftCheek.x - faceWidth * 0.15, leftCheek.y - faceHeight * 0.1);
+        this.ctx.lineTo(leftCheek.x + faceWidth * 0.05, leftCheek.y - faceHeight * 0.05);
+        this.ctx.lineTo(leftCheek.x + faceWidth * 0.1, leftCheek.y + faceHeight * 0.15);
+        this.ctx.lineTo(leftCheek.x - faceWidth * 0.1, leftCheek.y + faceHeight * 0.1);
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Breastplate ridges
-        this.ctx.strokeStyle = '#A9A9A9';
-        this.ctx.lineWidth = 2;
+        // Forehead plate
+        this.ctx.beginPath();
+        this.ctx.rect(forehead.x - faceWidth * 0.2, forehead.y - faceHeight * 0.15, faceWidth * 0.4, faceHeight * 0.1);
+        this.ctx.fill();
+        this.ctx.stroke();
         
-        for (let i = 0; i < 4; i++) {
-            const ridgeY = chest.y + faceWidth * 0.1 + i * faceWidth * 0.08;
-            this.ctx.beginPath();
-            this.ctx.moveTo(chest.x - faceWidth * 0.2, ridgeY);
-            this.ctx.quadraticCurveTo(chest.x, ridgeY + faceWidth * 0.02, chest.x + faceWidth * 0.2, ridgeY);
-            this.ctx.stroke();
-        }
-        
-        // Armor rivets
+        // Metal rivets
         this.ctx.fillStyle = '#2F2F2F';
-        
-        for (let i = 0; i < 6; i++) {
-            const rivetX = chest.x + (i - 2.5) * faceWidth * 0.1;
-            const rivetY = chest.y + faceWidth * 0.1;
+        for (let i = 0; i < 8; i++) {
+            const rivetX = leftCheek.x - faceWidth * 0.1 + (i % 3) * faceWidth * 0.06;
+            const rivetY = leftCheek.y - faceHeight * 0.05 + Math.floor(i / 3) * faceHeight * 0.06;
             
             this.ctx.beginPath();
             this.ctx.arc(rivetX, rivetY, 3, 0, 2 * Math.PI);
             this.ctx.fill();
         }
+    }
+    
+    drawLaserEye(landmarks, eyeDistance) {
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const time = Date.now() * 0.01;
         
-        // Shoulder pauldrons
-        this.ctx.fillStyle = '#C0C0C0';
-        this.ctx.strokeStyle = '#808080';
-        this.ctx.lineWidth = 2;
+        // Laser eye lens
+        this.ctx.fillStyle = '#FF0000';
+        this.ctx.strokeStyle = '#8B0000';
+        this.ctx.lineWidth = 3;
         
-        // Left pauldron
         this.ctx.beginPath();
-        this.ctx.arc(chest.x - faceWidth * 0.25, chest.y + faceWidth * 0.05, faceWidth * 0.12, 0, Math.PI);
+        this.ctx.arc(rightEye.x, rightEye.y, eyeDistance * 0.25, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Right pauldron
+        // Laser scanning lines
+        this.ctx.strokeStyle = '#FF4500';
+        this.ctx.lineWidth = 2;
+        
+        for (let i = 0; i < 5; i++) {
+            const lineY = rightEye.y - eyeDistance * 0.2 + (i * eyeDistance * 0.1) + Math.sin(time * 5 + i) * 5;
+            this.ctx.beginPath();
+            this.ctx.moveTo(rightEye.x - eyeDistance * 0.2, lineY);
+            this.ctx.lineTo(rightEye.x + eyeDistance * 0.2, lineY);
+            this.ctx.stroke();
+        }
+        
+        // Laser beam
+        const beamIntensity = Math.sin(time * 8) * 0.5 + 0.5;
+        this.ctx.strokeStyle = `rgba(255, 0, 0, ${beamIntensity})`;
+        this.ctx.lineWidth = 4;
+        
         this.ctx.beginPath();
-        this.ctx.arc(chest.x + faceWidth * 0.25, chest.y + faceWidth * 0.05, faceWidth * 0.12, 0, Math.PI);
-        this.ctx.fill();
+        this.ctx.moveTo(rightEye.x + eyeDistance * 0.25, rightEye.y);
+        this.ctx.lineTo(rightEye.x + eyeDistance * 2, rightEye.y + Math.sin(time * 2) * 20);
         this.ctx.stroke();
     }
     
-    drawKnightSword(landmarks, faceWidth) {
-        const chin = this.getLandmarkPoint(landmarks, 175);
-        const rightShoulder = { x: chin.x + faceWidth * 0.4, y: chin.y + faceWidth * 0.3 };
+    drawCircuitPatterns(landmarks, faceWidth, faceHeight) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
         
-        // Sword handle
-        this.ctx.fillStyle = '#8B4513'; // Brown handle
-        this.ctx.strokeStyle = '#654321';
+        // Green circuit lines
+        this.ctx.strokeStyle = '#00FF00';
         this.ctx.lineWidth = 2;
         
+        // Horizontal circuits
+        for (let i = 0; i < 6; i++) {
+            const circuitY = forehead.y + i * faceHeight * 0.1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(forehead.x - faceWidth * 0.3, circuitY);
+            this.ctx.lineTo(forehead.x + faceWidth * 0.3, circuitY);
+            this.ctx.stroke();
+            
+            // Circuit nodes
+            for (let j = 0; j < 4; j++) {
+                const nodeX = forehead.x - faceWidth * 0.2 + j * faceWidth * 0.133;
+                this.ctx.fillStyle = '#00FF00';
+                this.ctx.beginPath();
+                this.ctx.arc(nodeX, circuitY, 3, 0, 2 * Math.PI);
+                this.ctx.fill();
+            }
+        }
+        
+        // Vertical circuits
+        for (let i = 0; i < 4; i++) {
+            const circuitX = forehead.x - faceWidth * 0.2 + i * faceWidth * 0.133;
+            this.ctx.beginPath();
+            this.ctx.moveTo(circuitX, forehead.y);
+            this.ctx.lineTo(circuitX, forehead.y + faceHeight * 0.5);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawGlitchEffects(landmarks, faceWidth, faceHeight) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const time = Date.now() * 0.02;
+        
+        // Digital glitch bars
+        if (Math.sin(time * 10) > 0.7) {
+            this.ctx.fillStyle = `rgba(255, 0, 255, ${Math.random() * 0.5 + 0.3})`;
+            
+            for (let i = 0; i < 3; i++) {
+                const glitchY = forehead.y + Math.random() * faceHeight;
+                const glitchHeight = 5 + Math.random() * 10;
+                
+                this.ctx.beginPath();
+                this.ctx.rect(forehead.x - faceWidth * 0.4, glitchY, faceWidth * 0.8, glitchHeight);
+                this.ctx.fill();
+            }
+        }
+        
+        // Error messages
+        if (Math.sin(time * 15) > 0.8) {
+            this.ctx.font = `${Math.floor(faceWidth * 0.04)}px monospace`;
+            this.ctx.fillStyle = '#FF0000';
+            this.ctx.textAlign = 'left';
+            
+            const errors = ['ERROR 404', 'SYSTEM FAIL', 'REBOOT REQ'];
+            const errorText = errors[Math.floor(Math.random() * errors.length)];
+            
+            this.ctx.fillText(errorText, forehead.x - faceWidth * 0.3, forehead.y + faceHeight * 0.6);
+        }
+    }
+    
+    drawCyborgText(landmarks, faceWidth) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const time = Date.now() * 0.005;
+        
+        // Digital countdown
+        this.ctx.font = `bold ${Math.floor(faceWidth * 0.06)}px monospace`;
+        this.ctx.fillStyle = '#00FFFF';
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 1;
+        this.ctx.textAlign = 'center';
+        
+        const digitalTexts = ['SCANNING...', 'TARGET LOCKED', 'ANALYZE COMPLETE'];
+        
+        for (let i = 0; i < digitalTexts.length; i++) {
+            const textAngle = time * 2 + i * Math.PI / 1.5;
+            const textRadius = faceWidth * 0.8;
+            const textX = forehead.x + Math.cos(textAngle) * textRadius;
+            const textY = forehead.y + Math.sin(textAngle) * textRadius * 0.5;
+            
+            this.ctx.save();
+            this.ctx.translate(textX, textY);
+            this.ctx.strokeText(digitalTexts[i], 0, 0);
+            this.ctx.fillText(digitalTexts[i], 0, 0);
+            this.ctx.restore();
+        }
+    }
+    
+    drawDiscoFever(landmarks) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const eyeDistance = Math.abs(rightEye.x - leftEye.x);
+        const faceWidth = eyeDistance * 2;
+        const time = Date.now() * 0.01;
+        
+        // Disco afro hair
+        this.ctx.fillStyle = '#8B4513';
         this.ctx.beginPath();
-        this.ctx.rect(rightShoulder.x, rightShoulder.y, faceWidth * 0.04, faceWidth * 0.2);
+        this.ctx.arc(forehead.x, forehead.y - faceWidth * 0.4, faceWidth * 0.8, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Disco sunglasses
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.strokeStyle = '#FF1493';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.ellipse(leftEye.x, leftEye.y, eyeDistance * 0.3, eyeDistance * 0.2, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        this.ctx.beginPath();
+        this.ctx.ellipse(rightEye.x, rightEye.y, eyeDistance * 0.3, eyeDistance * 0.2, 0, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Sword crossguard
+        // Disco ball
         this.ctx.fillStyle = '#C0C0C0';
-        this.ctx.strokeStyle = '#808080';
+        this.ctx.beginPath();
+        this.ctx.arc(forehead.x, forehead.y - faceWidth * 0.8, faceWidth * 0.2, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Disco effects
+        for (let i = 0; i < 20; i++) {
+            const angle = time + i * Math.PI / 10;
+            const radius = faceWidth * 0.6;
+            const x = forehead.x + Math.cos(angle) * radius;
+            const y = forehead.y + Math.sin(angle) * radius * 0.5;
+            this.ctx.fillStyle = `hsl(${(time * 100 + i * 18) % 360}, 100%, 50%)`;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Music notes
+        this.ctx.font = `${faceWidth * 0.08}px Arial`;
+        this.ctx.fillStyle = '#FFD700';
+        const notes = ['♪', '♫', '♬'];
+        for (let i = 0; i < 5; i++) {
+            const noteX = forehead.x + Math.sin(time + i) * faceWidth * 0.8;
+            const noteY = forehead.y + Math.cos(time * 2 + i) * faceWidth * 0.4;
+            this.ctx.fillText(notes[i % notes.length], noteX, noteY);
+        }
+    }
+    
+    drawMimePerformance(landmarks) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        
+        // White face paint
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, forehead.y + faceWidth * 0.1, faceWidth * 0.5, faceWidth * 0.6, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Black tear lines
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftCheek.x, leftCheek.y - faceWidth * 0.1);
+        this.ctx.lineTo(leftCheek.x, leftCheek.y + faceWidth * 0.2);
+        this.ctx.moveTo(rightCheek.x, rightCheek.y - faceWidth * 0.1);
+        this.ctx.lineTo(rightCheek.x, rightCheek.y + faceWidth * 0.2);
+        this.ctx.stroke();
+        
+        // Striped shirt
+        for (let i = 0; i < 8; i++) {
+            this.ctx.fillStyle = i % 2 === 0 ? '#000' : '#FFF';
+            const stripeY = forehead.y + faceWidth * 0.5 + i * faceWidth * 0.08;
+            this.ctx.fillRect(forehead.x - faceWidth * 0.4, stripeY, faceWidth * 0.8, faceWidth * 0.08);
+        }
+        
+        // Invisible box effect
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        this.ctx.lineWidth = 3;
+        this.ctx.setLineDash([10, 5]);
+        this.ctx.strokeRect(forehead.x - faceWidth * 0.6, forehead.y - faceWidth * 0.3, faceWidth * 1.2, faceWidth * 0.8);
+        this.ctx.setLineDash([]);
+    }
+    
+    drawDragonLord(landmarks) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        const time = Date.now() * 0.005;
+        
+        // Dragon scales
+        this.ctx.fillStyle = '#228B22';
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 6; x++) {
+                const scaleX = forehead.x - faceWidth * 0.3 + x * faceWidth * 0.1;
+                const scaleY = forehead.y - faceWidth * 0.2 + y * faceWidth * 0.08;
+                this.ctx.beginPath();
+                this.ctx.ellipse(scaleX, scaleY, faceWidth * 0.04, faceWidth * 0.03, 0, 0, 2 * Math.PI);
+                this.ctx.fill();
+            }
+        }
+        
+        // Dragon horns
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x - faceWidth * 0.2, forehead.y - faceWidth * 0.1);
+        this.ctx.lineTo(forehead.x - faceWidth * 0.25, forehead.y - faceWidth * 0.4);
+        this.ctx.lineTo(forehead.x - faceWidth * 0.15, forehead.y - faceWidth * 0.3);
+        this.ctx.closePath();
+        this.ctx.fill();
         
         this.ctx.beginPath();
-        this.ctx.rect(rightShoulder.x - faceWidth * 0.06, rightShoulder.y - faceWidth * 0.02, faceWidth * 0.16, faceWidth * 0.04);
+        this.ctx.moveTo(forehead.x + faceWidth * 0.2, forehead.y - faceWidth * 0.1);
+        this.ctx.lineTo(forehead.x + faceWidth * 0.25, forehead.y - faceWidth * 0.4);
+        this.ctx.lineTo(forehead.x + faceWidth * 0.15, forehead.y - faceWidth * 0.3);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Fire breath
+        const fireColors = ['#FF4500', '#FF6347', '#FFD700'];
+        for (let i = 0; i < 12; i++) {
+            const fireX = nose.x + faceWidth * 0.2 + Math.sin(time * 5 + i) * faceWidth * 0.3;
+            const fireY = nose.y + Math.cos(time * 3 + i) * faceWidth * 0.2;
+            this.ctx.fillStyle = fireColors[i % fireColors.length];
+            this.ctx.beginPath();
+            this.ctx.arc(fireX, fireY, 8 + Math.sin(time * 8 + i) * 5, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Treasure coins
+        this.ctx.fillStyle = '#FFD700';
+        for (let i = 0; i < 6; i++) {
+            const coinX = forehead.x + Math.sin(time + i) * faceWidth * 0.8;
+            const coinY = forehead.y + faceWidth * 0.6 + Math.cos(time * 2 + i) * faceWidth * 0.2;
+            this.ctx.beginPath();
+            this.ctx.arc(coinX, coinY, 8, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+    }
+    
+    drawMagicShow(landmarks) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        const time = Date.now() * 0.008;
+        
+        // Top hat
+        this.ctx.fillStyle = '#000';
+        this.ctx.strokeStyle = '#333';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.rect(forehead.x - faceWidth * 0.25, forehead.y - faceWidth * 0.6, faceWidth * 0.5, faceWidth * 0.4);
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Sword blade (partially visible)
-        this.ctx.fillStyle = '#E6E6FA'; // Light steel
+        // Hat brim
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, forehead.y - faceWidth * 0.2, faceWidth * 0.35, faceWidth * 0.1, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Magic wand
+        this.ctx.strokeStyle = '#8B4513';
+        this.ctx.lineWidth = 6;
+        this.ctx.beginPath();
+        this.ctx.moveTo(forehead.x + faceWidth * 0.4, forehead.y);
+        this.ctx.lineTo(forehead.x + faceWidth * 0.6, forehead.y - faceWidth * 0.2);
+        this.ctx.stroke();
+        
+        // Wand star
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.strokeStyle = '#FFA500';
+        this.ctx.lineWidth = 2;
+        const starX = forehead.x + faceWidth * 0.6;
+        const starY = forehead.y - faceWidth * 0.2;
+        this.ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const angle = (i * Math.PI * 2) / 5;
+            const x = starX + Math.cos(angle) * 10;
+            const y = starY + Math.sin(angle) * 10;
+            if (i === 0) this.ctx.moveTo(x, y);
+            else this.ctx.lineTo(x, y);
+        }
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Magic sparkles
+        for (let i = 0; i < 15; i++) {
+            const sparkleX = forehead.x + Math.sin(time + i) * faceWidth * 0.8;
+            const sparkleY = forehead.y + Math.cos(time * 1.5 + i) * faceWidth * 0.6;
+            this.ctx.fillStyle = `hsl(${(time * 200 + i * 24) % 360}, 100%, 50%)`;
+            this.ctx.beginPath();
+            this.ctx.arc(sparkleX, sparkleY, 3 + Math.sin(time * 10 + i) * 2, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Rabbits appearing
+        if (Math.sin(time * 4) > 0.5) {
+            this.ctx.font = `${faceWidth * 0.1}px Arial`;
+            this.ctx.fillStyle = '#FFF';
+            this.ctx.fillText('🐰', forehead.x - faceWidth * 0.15, forehead.y - faceWidth * 0.4);
+        }
+    }
+    
+    drawUnderwaterDiver(landmarks) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        const time = Date.now() * 0.003;
+        
+        // Underwater background
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+        gradient.addColorStop(0, 'rgba(0, 100, 150, 0.3)');
+        gradient.addColorStop(1, 'rgba(0, 50, 100, 0.5)');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Diving mask
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 8;
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, forehead.y, faceWidth * 0.4, faceWidth * 0.3, 0, 0, 2 * Math.PI);
+        this.ctx.stroke();
+        
+        // Mask glass
+        this.ctx.fillStyle = 'rgba(150, 200, 255, 0.3)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, forehead.y, faceWidth * 0.35, faceWidth * 0.25, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Bubbles
+        for (let i = 0; i < 20; i++) {
+            const bubbleX = forehead.x + Math.sin(time + i) * faceWidth * 0.8;
+            const bubbleY = forehead.y - (time * 50 + i * 30) % (faceWidth * 2);
+            const bubbleSize = 5 + Math.sin(time * 3 + i) * 3;
+            this.ctx.fillStyle = 'rgba(173, 216, 230, 0.6)';
+            this.ctx.strokeStyle = 'rgba(100, 150, 200, 0.8)';
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.arc(bubbleX, bubbleY, bubbleSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+            this.ctx.stroke();
+        }
+        
+        // Fish
+        for (let i = 0; i < 4; i++) {
+            const fishX = forehead.x + Math.sin(time * 2 + i * 1.5) * faceWidth * 1.2;
+            const fishY = forehead.y + Math.cos(time + i) * faceWidth * 0.4;
+            this.ctx.fillStyle = `hsl(${60 + i * 90}, 70%, 50%)`;
+            this.ctx.beginPath();
+            this.ctx.ellipse(fishX, fishY, 15, 8, time + i, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Coral
+        this.ctx.strokeStyle = '#FF6347';
+        this.ctx.lineWidth = 6;
+        this.ctx.lineCap = 'round';
+        for (let i = 0; i < 5; i++) {
+            const coralX = forehead.x - faceWidth * 0.6 + i * faceWidth * 0.3;
+            const coralY = forehead.y + faceWidth * 0.6;
+            this.ctx.beginPath();
+            this.ctx.moveTo(coralX, coralY);
+            this.ctx.lineTo(coralX + Math.sin(time * 5 + i) * 20, coralY - faceWidth * 0.3);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawRockStar(landmarks) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        const time = Date.now() * 0.01;
+        
+        // Wild hair
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 8;
+        this.ctx.lineCap = 'round';
+        for (let i = 0; i < 20; i++) {
+            const angle = (i * Math.PI) / 10;
+            const hairLength = faceWidth * 0.4 + Math.sin(time * 3 + i) * 20;
+            const startX = forehead.x + Math.cos(angle) * faceWidth * 0.3;
+            const startY = forehead.y - faceWidth * 0.2;
+            const endX = startX + Math.cos(angle) * hairLength;
+            const endY = startY + Math.sin(angle) * hairLength;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(startX, startY);
+            this.ctx.lineTo(endX, endY);
+            this.ctx.stroke();
+        }
+        
+        // Leather jacket
+        this.ctx.fillStyle = '#000';
+        this.ctx.strokeStyle = '#333';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.rect(forehead.x - faceWidth * 0.4, forehead.y + faceWidth * 0.3, faceWidth * 0.8, faceWidth * 0.5);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Guitar
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 2;
+        const guitarX = forehead.x - faceWidth * 0.6;
+        const guitarY = forehead.y + faceWidth * 0.2;
+        this.ctx.beginPath();
+        this.ctx.ellipse(guitarX, guitarY, faceWidth * 0.15, faceWidth * 0.25, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Guitar strings
         this.ctx.strokeStyle = '#C0C0C0';
+        this.ctx.lineWidth = 1;
+        for (let i = 0; i < 6; i++) {
+            const stringY = guitarY - faceWidth * 0.2 + i * faceWidth * 0.067;
+            this.ctx.beginPath();
+            this.ctx.moveTo(guitarX - faceWidth * 0.1, stringY);
+            this.ctx.lineTo(guitarX + faceWidth * 0.1, stringY);
+            this.ctx.stroke();
+        }
         
+        // Stage lights
+        for (let i = 0; i < 8; i++) {
+            const lightAngle = time * 2 + i * Math.PI / 4;
+            const lightRadius = faceWidth * 0.8;
+            const lightX = forehead.x + Math.cos(lightAngle) * lightRadius;
+            const lightY = forehead.y + Math.sin(lightAngle) * lightRadius * 0.5;
+            this.ctx.fillStyle = `hsl(${(time * 100 + i * 45) % 360}, 100%, 50%)`;
+            this.ctx.beginPath();
+            this.ctx.arc(lightX, lightY, 10, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Crowd cheering text
+        this.ctx.font = `bold ${faceWidth * 0.05}px Arial`;
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.textAlign = 'center';
+        const crowdTexts = ['ROCK!', 'YEAH!', 'WOOOH!'];
+        for (let i = 0; i < crowdTexts.length; i++) {
+            const textX = forehead.x + Math.sin(time + i * 2) * faceWidth * 0.8;
+            const textY = forehead.y + faceWidth * 0.8 + Math.cos(time * 2 + i) * 20;
+            this.ctx.fillText(crowdTexts[i], textX, textY);
+        }
+    }
+    
+    drawChefMaster(landmarks) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        const time = Date.now() * 0.005;
+        
+        // Chef hat
+        this.ctx.fillStyle = '#FFF';
+        this.ctx.strokeStyle = '#CCC';
+        this.ctx.lineWidth = 2;
         this.ctx.beginPath();
-        this.ctx.moveTo(rightShoulder.x + faceWidth * 0.02, rightShoulder.y - faceWidth * 0.02);
-        this.ctx.lineTo(rightShoulder.x + faceWidth * 0.015, rightShoulder.y - faceWidth * 0.25);
-        this.ctx.lineTo(rightShoulder.x + faceWidth * 0.025, rightShoulder.y - faceWidth * 0.25);
-        this.ctx.lineTo(rightShoulder.x + faceWidth * 0.02, rightShoulder.y - faceWidth * 0.02);
+        this.ctx.ellipse(forehead.x, forehead.y - faceWidth * 0.4, faceWidth * 0.4, faceWidth * 0.3, 0, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
         
-        // Sword pommel
-        this.ctx.fillStyle = '#FFD700'; // Gold pommel
-        this.ctx.strokeStyle = '#B8860B';
-        
+        // Chef hat band
+        this.ctx.fillStyle = '#000';
         this.ctx.beginPath();
-        this.ctx.arc(rightShoulder.x + faceWidth * 0.02, rightShoulder.y + faceWidth * 0.2, faceWidth * 0.03, 0, 2 * Math.PI);
+        this.ctx.rect(forehead.x - faceWidth * 0.3, forehead.y - faceWidth * 0.15, faceWidth * 0.6, faceWidth * 0.08);
+        this.ctx.fill();
+        
+        // Chef mustache
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 2;
+        const noseY = this.getLandmarkPoint(landmarks, 2).y;
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, noseY + faceWidth * 0.1, faceWidth * 0.2, faceWidth * 0.05, 0, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.stroke();
+        
+        // Flying ingredients
+        const ingredients = ['🍅', '🧅', '🥕', '🌶️', '🥖'];
+        for (let i = 0; i < ingredients.length; i++) {
+            const ingredientX = forehead.x + Math.sin(time * 2 + i * 1.2) * faceWidth * 0.8;
+            const ingredientY = forehead.y + Math.cos(time * 3 + i * 0.8) * faceWidth * 0.6;
+            
+            this.ctx.font = `${faceWidth * 0.08}px Arial`;
+            this.ctx.fillText(ingredients[i], ingredientX, ingredientY);
+        }
+        
+        // Kitchen utensils
+        this.ctx.strokeStyle = '#C0C0C0';
+        this.ctx.lineWidth = 4;
+        this.ctx.lineCap = 'round';
+        
+        // Spatula
+        const spatulaX = forehead.x + faceWidth * 0.5;
+        const spatulaY = forehead.y + faceWidth * 0.2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(spatulaX, spatulaY);
+        this.ctx.lineTo(spatulaX, spatulaY + faceWidth * 0.3);
+        this.ctx.stroke();
+        
+        this.ctx.fillStyle = '#C0C0C0';
+        this.ctx.beginPath();
+        this.ctx.rect(spatulaX - 10, spatulaY - 20, 20, 15);
+        this.ctx.fill();
+        
+        // Steam effects
+        this.ctx.strokeStyle = '#DDD';
+        this.ctx.lineWidth = 3;
+        for (let i = 0; i < 6; i++) {
+            const steamX = forehead.x + (i - 2.5) * faceWidth * 0.1;
+            const steamY = forehead.y + faceWidth * 0.6;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(steamX, steamY);
+            this.ctx.quadraticCurveTo(
+                steamX + Math.sin(time * 4 + i) * 10,
+                steamY - faceWidth * 0.2,
+                steamX + Math.sin(time * 2 + i) * 20,
+                steamY - faceWidth * 0.4
+            );
+            this.ctx.stroke();
+        }
+        
+        // Chef text
+        this.ctx.font = `bold ${faceWidth * 0.06}px Arial`;
+        this.ctx.fillStyle = '#FF6347';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('BON APPÉTIT!', forehead.x, forehead.y + faceWidth * 0.8);
+    }
+
+    drawRealisticBeard(landmarks) {
+        const chin = this.getLandmarkPoint(landmarks, 175);
+        const jaw = this.getLandmarkPoint(landmarks, 172);
+        const leftJaw = this.getLandmarkPoint(landmarks, 172);
+        const rightJaw = this.getLandmarkPoint(landmarks, 397);
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        
+        // Create realistic beard gradient
+        const beardGradient = this.ctx.createRadialGradient(
+            chin.x, chin.y, 0,
+            chin.x, chin.y, faceWidth * 0.4
+        );
+        beardGradient.addColorStop(0, 'rgba(101, 67, 33, 0.9)');
+        beardGradient.addColorStop(0.3, 'rgba(139, 69, 19, 0.8)');
+        beardGradient.addColorStop(0.7, 'rgba(101, 67, 33, 0.6)');
+        beardGradient.addColorStop(1, 'rgba(101, 67, 33, 0.2)');
+        
+        // Main beard shape
+        this.ctx.fillStyle = beardGradient;
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftJaw.x, leftJaw.y);
+        this.ctx.quadraticCurveTo(chin.x, chin.y + faceWidth * 0.15, rightJaw.x, rightJaw.y);
+        this.ctx.quadraticCurveTo(rightJaw.x + faceWidth * 0.1, chin.y + faceWidth * 0.2, chin.x, chin.y + faceWidth * 0.25);
+        this.ctx.quadraticCurveTo(leftJaw.x - faceWidth * 0.1, chin.y + faceWidth * 0.2, leftJaw.x, leftJaw.y);
+        this.ctx.fill();
+        
+        // Individual beard hairs for realism
+        this.ctx.strokeStyle = 'rgba(101, 67, 33, 0.7)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.lineCap = 'round';
+        
+        for (let i = 0; i < 200; i++) {
+            const hairX = leftJaw.x + Math.random() * (rightJaw.x - leftJaw.x);
+            const hairY = chin.y + Math.random() * faceWidth * 0.25;
+            const hairLength = 8 + Math.random() * 12;
+            const hairAngle = Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(hairX, hairY);
+            this.ctx.lineTo(
+                hairX + Math.cos(hairAngle) * hairLength,
+                hairY + Math.sin(hairAngle) * hairLength
+            );
+            this.ctx.stroke();
+        }
+        
+        // Mustache
+        const noseBottom = this.getLandmarkPoint(landmarks, 2);
+        this.ctx.fillStyle = 'rgba(101, 67, 33, 0.9)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(noseBottom.x, noseBottom.y + faceWidth * 0.06, faceWidth * 0.12, faceWidth * 0.03, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Mustache hairs
+        for (let i = 0; i < 50; i++) {
+            const hairX = noseBottom.x + (Math.random() - 0.5) * faceWidth * 0.2;
+            const hairY = noseBottom.y + faceWidth * 0.05 + Math.random() * faceWidth * 0.02;
+            const hairLength = 4 + Math.random() * 6;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(hairX, hairY);
+            this.ctx.lineTo(hairX + (Math.random() - 0.5) * hairLength, hairY + Math.random() * hairLength);
+            this.ctx.stroke();
+        }
+    }
+
+    drawMakeupGlam(landmarks) {
+        // Implement makeup glamour drawing logic
+        // This could involve using makeup masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Makeup glamour drawing logic not implemented yet.');
+    }
+
+    drawBattleScars(landmarks) {
+        // Implement battle scars drawing logic
+        // This could involve using scar masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Battle scars drawing logic not implemented yet.');
+    }
+
+    drawAgingEffect(landmarks) {
+        // Implement aging effect drawing logic
+        // This could involve using aging masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Aging effect drawing logic not implemented yet.');
+    }
+
+    drawFaceTattoos(landmarks) {
+        // Implement face tattoos drawing logic
+        // This could involve using tattoo masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Face tattoos drawing logic not implemented yet.');
+    }
+
+    drawSnowEffect(landmarks) {
+        // Implement snow effect drawing logic
+        // This could involve using snow masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Snow effect drawing logic not implemented yet.');
+    }
+
+    drawGoldenHour(landmarks) {
+        // Implement golden hour drawing logic
+        // This could involve using golden hour masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Golden hour drawing logic not implemented yet.');
+    }
+
+    drawCyberpunkNeon(landmarks) {
+        // Implement cyberpunk neon drawing logic
+        // This could involve using neon masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Cyberpunk neon drawing logic not implemented yet.');
+    }
+
+    drawVintageFilm(landmarks) {
+        // Implement vintage film drawing logic
+        // This could involve using vintage film masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Vintage film drawing logic not implemented yet.');
+    }
+
+    drawRainGlass(landmarks) {
+        // Implement rain glass drawing logic
+        // This could involve using rain glass masks and blending techniques
+        // You might want to use a library like TensorFlow.js for this
+        console.log('Rain glass drawing logic not implemented yet.');
     }
 }
 
