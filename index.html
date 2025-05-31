@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Webcam Filters</title>
+    <meta name="description" content="Real-time webcam filters with face detection - like Snapchat filters!">
+    <meta name="keywords" content="webcam, filters, face detection, snapchat, photo, camera, fun">
+    <meta name="author" content="Fun Webcam Filters">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Webcam Filters">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎭%3C/text%3E%3C/svg%3E">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎭 Fun Webcam Filters</h1>
+            <p>Turn on your camera and try some hilarious filters!</p>
+        </header>
+
+        <main>
+            <div class="camera-container">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="canvas"></canvas>
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading face detection...</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="startCamera" class="btn btn-primary">
+                    📹 Start Camera
+                </button>
+                
+                <div class="filter-grid" id="filterGrid" style="display: none;">
+                    <button class="filter-btn" data-filter="none">
+                        <span class="filter-icon">🚫</span>
+                        <span class="filter-name">No Filter</span>
+                    </button>
+                    
+                    <button class="filter-btn" data-filter="sunglasses">
+                        <span class="filter-icon">🕶️</span>
+                        <span class="filter-name">Sunglasses</span>
+                    </button>
+                    
+                    <button class="filter-btn" data-filter="mustache">
+                        <span class="filter-icon">👨</span>
+                        <span class="filter-name">Mustache</span>
+                    </button>
+                    
+                    <button class="filter-btn" data-filter="dogears">
+                        <span class="filter-icon">🐕</span>
+                        <span class="filter-name">Dog Ears</span>
+                    </button>
+                    
+                    <button class="filter-btn" data-filter="crown">
+                        <span class="filter-icon">👑</span>
+                        <span class="filter-name">Crown</span>
+                    </button>
+                    
+                    <button class="filter-btn" data-filter="heart-eyes">
+                        <span class="filter-icon">😍</span>
+                        <span class="filter-name">Heart Eyes</span>
+                    </button>
+                    
+                    <button class="filter-btn" data-filter="rainbow">
+                        <span class="filter-icon">🌈</span>
+                        <span class="filter-name">Rainbow</span>
+                    </button>
+                    
+                    <button class="filter-btn" data-filter="party">
+                        <span class="filter-icon">🎉</span>
+                        <span class="filter-name">Party Hat</span>
+                    </button>
+                </div>
+
+                <div class="action-buttons" id="actionButtons" style="display: none;">
+                    <button id="capturePhoto" class="btn btn-secondary">
+                        📸 Take Photo
+                    </button>
+                    <button id="toggleCamera" class="btn btn-secondary">
+                        🔄 Flip Camera
+                    </button>
+                </div>
+            </div>
+
+            <div id="photoGallery" class="photo-gallery" style="display: none;">
+                <h3>📷 Your Photos</h3>
+                <div id="photos" class="photos-grid"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ for fun! Share your filtered selfies!</p>
+        </footer>
+    </div>
+
+    <!-- Face detection library -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
