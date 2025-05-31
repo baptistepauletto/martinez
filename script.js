@@ -4169,66 +4169,591 @@ class WebcamFilters {
     }
 
     drawMakeupGlam(landmarks) {
-        // Implement makeup glamour drawing logic
-        // This could involve using makeup masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Makeup glamour drawing logic not implemented yet.');
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const eyeDistance = Math.abs(rightEye.x - leftEye.x);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        
+        // Realistic eyeshadow with gradient
+        const eyeshadowGradient = this.ctx.createRadialGradient(
+            leftEye.x, leftEye.y - eyeDistance * 0.1, 0,
+            leftEye.x, leftEye.y - eyeDistance * 0.1, eyeDistance * 0.4
+        );
+        eyeshadowGradient.addColorStop(0, 'rgba(147, 112, 219, 0.8)');
+        eyeshadowGradient.addColorStop(0.5, 'rgba(186, 85, 211, 0.6)');
+        eyeshadowGradient.addColorStop(1, 'rgba(147, 112, 219, 0.2)');
+        
+        // Left eye makeup
+        this.ctx.fillStyle = eyeshadowGradient;
+        this.ctx.beginPath();
+        this.ctx.ellipse(leftEye.x, leftEye.y - eyeDistance * 0.1, eyeDistance * 0.35, eyeDistance * 0.25, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Right eye makeup
+        const rightEyeshadowGradient = this.ctx.createRadialGradient(
+            rightEye.x, rightEye.y - eyeDistance * 0.1, 0,
+            rightEye.x, rightEye.y - eyeDistance * 0.1, eyeDistance * 0.4
+        );
+        rightEyeshadowGradient.addColorStop(0, 'rgba(147, 112, 219, 0.8)');
+        rightEyeshadowGradient.addColorStop(0.5, 'rgba(186, 85, 211, 0.6)');
+        rightEyeshadowGradient.addColorStop(1, 'rgba(147, 112, 219, 0.2)');
+        
+        this.ctx.fillStyle = rightEyeshadowGradient;
+        this.ctx.beginPath();
+        this.ctx.ellipse(rightEye.x, rightEye.y - eyeDistance * 0.1, eyeDistance * 0.35, eyeDistance * 0.25, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Realistic eyeliner
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        
+        // Left eyeliner
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftEye.x - eyeDistance * 0.2, leftEye.y);
+        this.ctx.lineTo(leftEye.x + eyeDistance * 0.2, leftEye.y);
+        this.ctx.lineTo(leftEye.x + eyeDistance * 0.25, leftEye.y - eyeDistance * 0.05);
+        this.ctx.stroke();
+        
+        // Right eyeliner
+        this.ctx.beginPath();
+        this.ctx.moveTo(rightEye.x - eyeDistance * 0.2, rightEye.y);
+        this.ctx.lineTo(rightEye.x + eyeDistance * 0.2, rightEye.y);
+        this.ctx.lineTo(rightEye.x + eyeDistance * 0.25, rightEye.y - eyeDistance * 0.05);
+        this.ctx.stroke();
+        
+        // Realistic blush
+        const blushGradient = this.ctx.createRadialGradient(
+            leftCheek.x, leftCheek.y, 0,
+            leftCheek.x, leftCheek.y, eyeDistance * 0.3
+        );
+        blushGradient.addColorStop(0, 'rgba(255, 182, 193, 0.6)');
+        blushGradient.addColorStop(1, 'rgba(255, 182, 193, 0.1)');
+        
+        this.ctx.fillStyle = blushGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(leftCheek.x, leftCheek.y, eyeDistance * 0.25, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        this.ctx.beginPath();
+        this.ctx.arc(rightCheek.x, rightCheek.y, eyeDistance * 0.25, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Glossy lips
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const lipGradient = this.ctx.createLinearGradient(
+            mouth.x, mouth.y - eyeDistance * 0.05,
+            mouth.x, mouth.y + eyeDistance * 0.05
+        );
+        lipGradient.addColorStop(0, 'rgba(220, 20, 60, 0.9)');
+        lipGradient.addColorStop(0.5, 'rgba(255, 20, 147, 0.8)');
+        lipGradient.addColorStop(1, 'rgba(199, 21, 133, 0.9)');
+        
+        this.ctx.fillStyle = lipGradient;
+        this.ctx.beginPath();
+        this.ctx.ellipse(mouth.x, mouth.y, eyeDistance * 0.2, eyeDistance * 0.08, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Lip gloss highlight
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(mouth.x, mouth.y - eyeDistance * 0.02, eyeDistance * 0.15, eyeDistance * 0.03, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
     }
 
     drawBattleScars(landmarks) {
-        // Implement battle scars drawing logic
-        // This could involve using scar masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Battle scars drawing logic not implemented yet.');
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        
+        // Realistic scar on forehead
+        this.drawRealisticScar(
+            forehead.x - faceWidth * 0.08, forehead.y - faceWidth * 0.05,
+            forehead.x + faceWidth * 0.12, forehead.y + faceWidth * 0.02,
+            faceWidth * 0.008
+        );
+        
+        // Cheek scar
+        this.drawRealisticScar(
+            leftCheek.x - faceWidth * 0.05, leftCheek.y - faceWidth * 0.08,
+            leftCheek.x + faceWidth * 0.03, leftCheek.y + faceWidth * 0.05,
+            faceWidth * 0.006
+        );
+        
+        // Small scars
+        for (let i = 0; i < 3; i++) {
+            const scarX = forehead.x + (Math.random() - 0.5) * faceWidth * 0.6;
+            const scarY = forehead.y + (Math.random() - 0.2) * faceWidth * 0.4;
+            const scarEndX = scarX + (Math.random() - 0.5) * faceWidth * 0.1;
+            const scarEndY = scarY + (Math.random() - 0.5) * faceWidth * 0.08;
+            
+            this.drawRealisticScar(scarX, scarY, scarEndX, scarEndY, faceWidth * 0.004);
+        }
+    }
+    
+    drawRealisticScar(startX, startY, endX, endY, width) {
+        // Scar base
+        this.ctx.strokeStyle = 'rgba(139, 90, 90, 0.8)';
+        this.ctx.lineWidth = width * 2;
+        this.ctx.lineCap = 'round';
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(endX, endY);
+        this.ctx.stroke();
+        
+        // Scar highlight
+        this.ctx.strokeStyle = 'rgba(210, 180, 180, 0.6)';
+        this.ctx.lineWidth = width;
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(endX, endY);
+        this.ctx.stroke();
+        
+        // Scar stitches for realism
+        const distance = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
+        const stitches = Math.floor(distance / 20);
+        
+        for (let i = 0; i < stitches; i++) {
+            const t = i / (stitches - 1);
+            const stitchX = startX + (endX - startX) * t;
+            const stitchY = startY + (endY - startY) * t;
+            
+            this.ctx.strokeStyle = 'rgba(80, 80, 80, 0.7)';
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(stitchX - width * 2, stitchY - width * 2);
+            this.ctx.lineTo(stitchX + width * 2, stitchY + width * 2);
+            this.ctx.moveTo(stitchX + width * 2, stitchY - width * 2);
+            this.ctx.lineTo(stitchX - width * 2, stitchY + width * 2);
+            this.ctx.stroke();
+        }
     }
 
     drawAgingEffect(landmarks) {
-        // Implement aging effect drawing logic
-        // This could involve using aging masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Aging effect drawing logic not implemented yet.');
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const eyeDistance = Math.abs(rightEye.x - leftEye.x);
+        const faceWidth = eyeDistance * 2;
+        
+        // Forehead wrinkles
+        this.ctx.strokeStyle = 'rgba(139, 115, 85, 0.4)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.lineCap = 'round';
+        
+        for (let i = 0; i < 4; i++) {
+            const wrinkleY = forehead.y - faceWidth * 0.1 + i * faceWidth * 0.04;
+            this.ctx.beginPath();
+            this.ctx.moveTo(forehead.x - faceWidth * 0.2, wrinkleY);
+            this.ctx.quadraticCurveTo(forehead.x, wrinkleY + faceWidth * 0.01, forehead.x + faceWidth * 0.2, wrinkleY);
+            this.ctx.stroke();
+        }
+        
+        // Crow's feet around eyes
+        const crowsFeetLines = [
+            { dx: 0.25, dy: -0.1 }, { dx: 0.3, dy: -0.05 }, { dx: 0.3, dy: 0 },
+            { dx: 0.3, dy: 0.05 }, { dx: 0.25, dy: 0.1 }
+        ];
+        
+        crowsFeetLines.forEach(line => {
+            // Left eye crow's feet
+            this.ctx.beginPath();
+            this.ctx.moveTo(leftEye.x + eyeDistance * 0.15, leftEye.y);
+            this.ctx.lineTo(leftEye.x + eyeDistance * line.dx, leftEye.y + eyeDistance * line.dy);
+            this.ctx.stroke();
+            
+            // Right eye crow's feet (mirrored)
+            this.ctx.beginPath();
+            this.ctx.moveTo(rightEye.x - eyeDistance * 0.15, rightEye.y);
+            this.ctx.lineTo(rightEye.x - eyeDistance * line.dx, rightEye.y + eyeDistance * line.dy);
+            this.ctx.stroke();
+        });
+        
+        // Nasolabial folds
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(nose.x - eyeDistance * 0.1, nose.y + eyeDistance * 0.1);
+        this.ctx.quadraticCurveTo(
+            nose.x - eyeDistance * 0.15, mouth.y - eyeDistance * 0.05,
+            mouth.x - eyeDistance * 0.15, mouth.y + eyeDistance * 0.05
+        );
+        this.ctx.stroke();
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(nose.x + eyeDistance * 0.1, nose.y + eyeDistance * 0.1);
+        this.ctx.quadraticCurveTo(
+            nose.x + eyeDistance * 0.15, mouth.y - eyeDistance * 0.05,
+            mouth.x + eyeDistance * 0.15, mouth.y + eyeDistance * 0.05
+        );
+        this.ctx.stroke();
+        
+        // Age spots
+        this.ctx.fillStyle = 'rgba(139, 115, 85, 0.3)';
+        for (let i = 0; i < 8; i++) {
+            const spotX = forehead.x + (Math.random() - 0.5) * faceWidth * 0.8;
+            const spotY = forehead.y + (Math.random() - 0.2) * faceWidth * 0.6;
+            const spotSize = 2 + Math.random() * 4;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(spotX, spotY, spotSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
     }
 
     drawFaceTattoos(landmarks) {
-        // Implement face tattoos drawing logic
-        // This could involve using tattoo masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Face tattoos drawing logic not implemented yet.');
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        
+        // Tribal tattoo on left cheek
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        
+        // Complex tribal pattern
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftCheek.x - faceWidth * 0.08, leftCheek.y - faceWidth * 0.1);
+        this.ctx.quadraticCurveTo(leftCheek.x, leftCheek.y - faceWidth * 0.05, leftCheek.x + faceWidth * 0.05, leftCheek.y);
+        this.ctx.quadraticCurveTo(leftCheek.x + faceWidth * 0.03, leftCheek.y + faceWidth * 0.08, leftCheek.x - faceWidth * 0.02, leftCheek.y + faceWidth * 0.1);
+        this.ctx.quadraticCurveTo(leftCheek.x - faceWidth * 0.06, leftCheek.y + faceWidth * 0.05, leftCheek.x - faceWidth * 0.08, leftCheek.y - faceWidth * 0.1);
+        this.ctx.stroke();
+        
+        // Inner tribal details
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftCheek.x - faceWidth * 0.04, leftCheek.y - faceWidth * 0.03);
+        this.ctx.lineTo(leftCheek.x + faceWidth * 0.02, leftCheek.y + faceWidth * 0.02);
+        this.ctx.moveTo(leftCheek.x - faceWidth * 0.02, leftCheek.y + faceWidth * 0.03);
+        this.ctx.lineTo(leftCheek.x + faceWidth * 0.01, leftCheek.y - faceWidth * 0.02);
+        this.ctx.stroke();
+        
+        // Star tattoo on forehead
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.lineWidth = 2;
+        
+        const starX = forehead.x;
+        const starY = forehead.y - faceWidth * 0.08;
+        const starSize = faceWidth * 0.04;
+        
+        this.ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const angle = (i * Math.PI * 2) / 5 - Math.PI / 2;
+            const x = starX + Math.cos(angle) * starSize;
+            const y = starY + Math.sin(angle) * starSize;
+            
+            if (i === 0) this.ctx.moveTo(x, y);
+            else {
+                const prevAngle = ((i - 2) * Math.PI * 2) / 5 - Math.PI / 2;
+                const prevX = starX + Math.cos(prevAngle) * starSize;
+                const prevY = starY + Math.sin(prevAngle) * starSize;
+                this.ctx.lineTo(prevX, prevY);
+                this.ctx.lineTo(x, y);
+            }
+        }
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Small dots tattoo on right cheek
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        for (let i = 0; i < 7; i++) {
+            const dotX = rightCheek.x + Math.sin(i * 0.8) * faceWidth * 0.05;
+            const dotY = rightCheek.y + Math.cos(i * 0.8) * faceWidth * 0.05;
+            const dotSize = 2 + i % 3;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(dotX, dotY, dotSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
     }
 
     drawSnowEffect(landmarks) {
-        // Implement snow effect drawing logic
-        // This could involve using snow masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Snow effect drawing logic not implemented yet.');
+        const time = Date.now() * 0.002;
+        
+        // Snow particles
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        this.ctx.strokeStyle = 'rgba(200, 200, 255, 0.3)';
+        this.ctx.lineWidth = 1;
+        
+        for (let i = 0; i < 100; i++) {
+            const snowX = (time * 30 + i * 123) % this.canvas.width;
+            const snowY = (time * 50 + i * 456) % this.canvas.height;
+            const snowSize = 2 + (i % 4);
+            const drift = Math.sin(time * 3 + i) * 20;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(snowX + drift, snowY, snowSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            // Snowflake details for larger flakes
+            if (snowSize > 3) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(snowX + drift - 3, snowY);
+                this.ctx.lineTo(snowX + drift + 3, snowY);
+                this.ctx.moveTo(snowX + drift, snowY - 3);
+                this.ctx.lineTo(snowX + drift, snowY + 3);
+                this.ctx.moveTo(snowX + drift - 2, snowY - 2);
+                this.ctx.lineTo(snowX + drift + 2, snowY + 2);
+                this.ctx.moveTo(snowX + drift + 2, snowY - 2);
+                this.ctx.lineTo(snowX + drift - 2, snowY + 2);
+                this.ctx.stroke();
+            }
+        }
+        
+        // Cold breath effect
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const breathGradient = this.ctx.createRadialGradient(
+            mouth.x, mouth.y, 0,
+            mouth.x + 50, mouth.y - 30, 60
+        );
+        breathGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+        breathGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        this.ctx.fillStyle = breathGradient;
+        this.ctx.beginPath();
+        this.ctx.ellipse(mouth.x + 30, mouth.y - 15, 40, 20, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
     }
 
     drawGoldenHour(landmarks) {
-        // Implement golden hour drawing logic
-        // This could involve using golden hour masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Golden hour drawing logic not implemented yet.');
+        // Golden hour lighting overlay
+        const goldenGradient = this.ctx.createLinearGradient(
+            0, 0, this.canvas.width, this.canvas.height
+        );
+        goldenGradient.addColorStop(0, 'rgba(255, 215, 0, 0.15)');
+        goldenGradient.addColorStop(0.5, 'rgba(255, 165, 0, 0.1)');
+        goldenGradient.addColorStop(1, 'rgba(255, 140, 0, 0.2)');
+        
+        this.ctx.fillStyle = goldenGradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Rim lighting on face
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        
+        // Rim light gradient
+        const rimGradient = this.ctx.createRadialGradient(
+            forehead.x - faceWidth * 0.3, forehead.y - faceWidth * 0.2, 0,
+            forehead.x - faceWidth * 0.3, forehead.y - faceWidth * 0.2, faceWidth * 0.8
+        );
+        rimGradient.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
+        rimGradient.addColorStop(0.7, 'rgba(255, 165, 0, 0.2)');
+        rimGradient.addColorStop(1, 'rgba(255, 165, 0, 0)');
+        
+        this.ctx.fillStyle = rimGradient;
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, forehead.y + faceWidth * 0.1, faceWidth * 0.6, faceWidth * 0.8, 0, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Lens flares
+        const time = Date.now() * 0.001;
+        for (let i = 0; i < 5; i++) {
+            const flareX = forehead.x + Math.sin(time + i) * faceWidth * 0.8;
+            const flareY = forehead.y + Math.cos(time * 1.2 + i) * faceWidth * 0.6;
+            const flareSize = 10 + Math.sin(time * 3 + i) * 8;
+            
+            this.ctx.fillStyle = `rgba(255, 255, 100, ${0.3 + Math.sin(time * 2 + i) * 0.2})`;
+            this.ctx.beginPath();
+            this.ctx.arc(flareX, flareY, flareSize, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
     }
 
     drawCyberpunkNeon(landmarks) {
-        // Implement cyberpunk neon drawing logic
-        // This could involve using neon masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Cyberpunk neon drawing logic not implemented yet.');
+        const time = Date.now() * 0.003;
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const eyeDistance = Math.abs(this.getLandmarkPoint(landmarks, 33).x - this.getLandmarkPoint(landmarks, 263).x);
+        const faceWidth = eyeDistance * 2;
+        
+        // Neon city background
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Neon face outline
+        this.ctx.strokeStyle = `rgba(0, 255, 255, ${0.8 + Math.sin(time * 5) * 0.2})`;
+        this.ctx.lineWidth = 3;
+        this.ctx.shadowColor = '#00FFFF';
+        this.ctx.shadowBlur = 15;
+        
+        this.ctx.beginPath();
+        this.ctx.ellipse(forehead.x, forehead.y + faceWidth * 0.1, faceWidth * 0.5, faceWidth * 0.7, 0, 0, 2 * Math.PI);
+        this.ctx.stroke();
+        
+        // Neon grid lines
+        this.ctx.strokeStyle = `rgba(255, 0, 255, ${0.5 + Math.sin(time * 4) * 0.3})`;
+        this.ctx.lineWidth = 2;
+        this.ctx.shadowColor = '#FF00FF';
+        this.ctx.shadowBlur = 10;
+        
+        // Horizontal lines
+        for (let i = 0; i < 8; i++) {
+            const lineY = i * this.canvas.height / 8;
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, lineY);
+            this.ctx.lineTo(this.canvas.width, lineY);
+            this.ctx.stroke();
+        }
+        
+        // Vertical lines
+        for (let i = 0; i < 10; i++) {
+            const lineX = i * this.canvas.width / 10;
+            this.ctx.beginPath();
+            this.ctx.moveTo(lineX, 0);
+            this.ctx.lineTo(lineX, this.canvas.height);
+            this.ctx.stroke();
+        }
+        
+        // Neon particles
+        this.ctx.shadowBlur = 20;
+        for (let i = 0; i < 30; i++) {
+            const particleX = forehead.x + Math.sin(time + i) * faceWidth * 0.8;
+            const particleY = forehead.y + Math.cos(time * 1.5 + i) * faceWidth * 0.6;
+            const hue = (time * 100 + i * 12) % 360;
+            
+            this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${0.6 + Math.sin(time * 8 + i) * 0.4})`;
+            this.ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+            this.ctx.beginPath();
+            this.ctx.arc(particleX, particleY, 3, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
     }
 
     drawVintageFilm(landmarks) {
-        // Implement vintage film drawing logic
-        // This could involve using vintage film masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Vintage film drawing logic not implemented yet.');
+        // Film grain texture
+        const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        const data = imageData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const noise = (Math.random() - 0.5) * 30;
+            data[i] += noise;     // Red
+            data[i + 1] += noise; // Green
+            data[i + 2] += noise; // Blue
+        }
+        
+        this.ctx.putImageData(imageData, 0, 0);
+        
+        // Sepia tone overlay
+        this.ctx.fillStyle = 'rgba(222, 184, 135, 0.15)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Vignette effect
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY);
+        
+        const vignetteGradient = this.ctx.createRadialGradient(
+            centerX, centerY, 0,
+            centerX, centerY, maxRadius
+        );
+        vignetteGradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        vignetteGradient.addColorStop(0.6, 'rgba(0, 0, 0, 0)');
+        vignetteGradient.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+        
+        this.ctx.fillStyle = vignetteGradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Film scratches
+        const time = Date.now() * 0.001;
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 1;
+        
+        for (let i = 0; i < 5; i++) {
+            const scratchX = (time * 200 + i * 123) % this.canvas.width;
+            this.ctx.beginPath();
+            this.ctx.moveTo(scratchX, 0);
+            this.ctx.lineTo(scratchX + Math.sin(time + i) * 50, this.canvas.height);
+            this.ctx.stroke();
+        }
+        
+        // Film border
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.lineWidth = 20;
+        this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     drawRainGlass(landmarks) {
-        // Implement rain glass drawing logic
-        // This could involve using rain glass masks and blending techniques
-        // You might want to use a library like TensorFlow.js for this
-        console.log('Rain glass drawing logic not implemented yet.');
+        const time = Date.now() * 0.002;
+        
+        // Glass surface with slight tint
+        this.ctx.fillStyle = 'rgba(173, 216, 230, 0.1)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Water droplets
+        for (let i = 0; i < 50; i++) {
+            const dropX = (Math.sin(i * 1.2) * 0.3 + 0.5) * this.canvas.width;
+            const dropY = (time * 100 + i * 23) % (this.canvas.height + 100);
+            const dropSize = 3 + (i % 5);
+            const dropSpeed = 1 + (i % 3) * 0.5;
+            
+            // Droplet body
+            this.ctx.fillStyle = 'rgba(173, 216, 230, 0.6)';
+            this.ctx.strokeStyle = 'rgba(100, 149, 237, 0.8)';
+            this.ctx.lineWidth = 1;
+            
+            this.ctx.beginPath();
+            this.ctx.ellipse(dropX, dropY, dropSize, dropSize * 1.5, 0, 0, 2 * Math.PI);
+            this.ctx.fill();
+            this.ctx.stroke();
+            
+            // Droplet highlight
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            this.ctx.beginPath();
+            this.ctx.ellipse(dropX - dropSize * 0.3, dropY - dropSize * 0.3, dropSize * 0.3, dropSize * 0.4, 0, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            // Water trails
+            if (dropSize > 4) {
+                this.ctx.strokeStyle = 'rgba(173, 216, 230, 0.4)';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.moveTo(dropX, dropY + dropSize);
+                this.ctx.lineTo(dropX + Math.sin(time + i) * 5, dropY + dropSize * 3);
+                this.ctx.stroke();
+            }
+        }
+        
+        // Fogged glass effect around breath
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const fogGradient = this.ctx.createRadialGradient(
+            mouth.x, mouth.y, 0,
+            mouth.x, mouth.y, 80
+        );
+        fogGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+        fogGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        this.ctx.fillStyle = fogGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(mouth.x, mouth.y, 60, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Glass reflection streaks
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        
+        for (let i = 0; i < 8; i++) {
+            const streakX = i * this.canvas.width / 8;
+            const streakOffset = Math.sin(time + i) * 30;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(streakX + streakOffset, 0);
+            this.ctx.lineTo(streakX + streakOffset + 20, this.canvas.height);
+            this.ctx.stroke();
+        }
     }
 }
 
