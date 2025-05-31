@@ -195,6 +195,9 @@ class WebcamFilters {
             case 'hijab':
                 this.drawHijab(landmarks);
                 break;
+            case 'pilot':
+                this.drawPilotMask(landmarks);
+                break;
         }
     }
 
@@ -1098,7 +1101,7 @@ class WebcamFilters {
             forehead.x - faceWidth * 0.05, 
             forehead.y - faceHeight * 0.15,
             leftTemple.x - faceWidth * 0.1, 
-            forehead.y - faceHeight * 0.1
+            leftTemple.y - faceHeight * 0.1
         );
         
         this.ctx.closePath();
@@ -1273,6 +1276,389 @@ class WebcamFilters {
         }
     }
 
+    drawPilotMask(landmarks) {
+        // Get key face landmarks for pilot gear positioning
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const chin = this.getLandmarkPoint(landmarks, 175);
+        const leftTemple = this.getLandmarkPoint(landmarks, 127);
+        const rightTemple = this.getLandmarkPoint(landmarks, 356);
+        
+        // Calculate dimensions
+        const eyeDistance = Math.abs(rightEye.x - leftEye.x);
+        const faceWidth = eyeDistance * 2;
+        const faceHeight = Math.abs(chin.y - forehead.y);
+        
+        // Draw subtle cockpit overlay (without covering the face)
+        this.drawCockpitOverlay();
+        
+        // Draw pilot helmet
+        this.drawPilotHelmet(landmarks, faceWidth, faceHeight);
+        
+        // Draw aviation goggles
+        this.drawAviationGoggles(landmarks, eyeDistance);
+        
+        // Draw oxygen mask (optional, positioned below nose)
+        this.drawOxygenMask(landmarks, faceWidth);
+        
+        // Draw cockpit HUD elements
+        this.drawCockpitHUD();
+    }
+    
+    drawAviationBackground() {
+        // Save current canvas state
+        this.ctx.save();
+        
+        // Create sky gradient background
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+        gradient.addColorStop(0, '#87CEEB'); // Sky blue at top
+        gradient.addColorStop(0.7, '#B0E0E6'); // Lighter blue
+        gradient.addColorStop(1, '#F0F8FF'); // Almost white at bottom
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw moving clouds
+        const time = Date.now() * 0.001;
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        
+        for (let i = 0; i < 8; i++) {
+            const cloudX = (this.canvas.width * 0.2 * i + time * 20 + i * 100) % (this.canvas.width + 200) - 100;
+            const cloudY = this.canvas.height * 0.1 + Math.sin(time + i) * 20;
+            
+            // Draw fluffy cloud
+            for (let j = 0; j < 5; j++) {
+                const radius = 15 + j * 5 + Math.sin(time * 2 + i + j) * 3;
+                const offsetX = j * 12 - 24;
+                this.ctx.beginPath();
+                this.ctx.arc(cloudX + offsetX, cloudY, radius, 0, 2 * Math.PI);
+                this.ctx.fill();
+            }
+        }
+        
+        // Draw cockpit frame elements
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.strokeStyle = '#333';
+        this.ctx.lineWidth = 3;
+        
+        // Top cockpit frame
+        this.ctx.fillRect(0, 0, this.canvas.width, 40);
+        
+        // Side cockpit frames
+        this.ctx.fillRect(0, 0, 60, this.canvas.height);
+        this.ctx.fillRect(this.canvas.width - 60, 0, 60, this.canvas.height);
+        
+        // Add cockpit window reflection
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        this.ctx.fillRect(60, 40, this.canvas.width - 120, this.canvas.height * 0.3);
+        
+        this.ctx.restore();
+    }
+    
+    drawPilotHelmet(landmarks, faceWidth, faceHeight) {
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftTemple = this.getLandmarkPoint(landmarks, 127);
+        const rightTemple = this.getLandmarkPoint(landmarks, 356);
+        
+        // Helmet colors
+        this.ctx.fillStyle = '#2F4F4F'; // Dark slate gray
+        this.ctx.strokeStyle = '#1C1C1C';
+        this.ctx.lineWidth = 2;
+        
+        // Main helmet shape
+        this.ctx.beginPath();
+        this.ctx.arc(
+            forehead.x, 
+            forehead.y - faceHeight * 0.3, 
+            faceWidth * 0.65, 
+            0.2 * Math.PI, 
+            0.8 * Math.PI
+        );
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Helmet visor/peak
+        this.ctx.fillStyle = '#1C1C1C';
+        this.ctx.beginPath();
+        this.ctx.ellipse(
+            forehead.x, 
+            forehead.y - faceHeight * 0.05, 
+            faceWidth * 0.4, 
+            faceHeight * 0.08, 
+            0, 0, Math.PI
+        );
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Helmet details and rivets
+        this.ctx.fillStyle = '#708090';
+        for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3 + Math.PI / 6;
+            const x = forehead.x + Math.cos(angle) * faceWidth * 0.5;
+            const y = forehead.y - faceHeight * 0.3 + Math.sin(angle) * faceHeight * 0.25;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Helmet chin strap
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftTemple.x - faceWidth * 0.1, leftTemple.y + faceHeight * 0.3);
+        this.ctx.quadraticCurveTo(
+            forehead.x, 
+            leftTemple.y + faceHeight * 0.5,
+            rightTemple.x + faceWidth * 0.1, 
+            rightTemple.y + faceHeight * 0.3
+        );
+        this.ctx.stroke();
+    }
+    
+    drawAviationGoggles(landmarks, eyeDistance) {
+        const leftEye = this.getLandmarkPoint(landmarks, 33);
+        const rightEye = this.getLandmarkPoint(landmarks, 263);
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        
+        const goggleSize = eyeDistance * 0.8;
+        
+        // Goggle frame
+        this.ctx.fillStyle = '#8B4513'; // Brown leather
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 3;
+        
+        // Left goggle frame
+        this.ctx.beginPath();
+        this.ctx.arc(leftEye.x, leftEye.y, goggleSize * 0.6, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Right goggle frame
+        this.ctx.beginPath();
+        this.ctx.arc(rightEye.x, rightEye.y, goggleSize * 0.6, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Goggle lenses with reflection
+        this.ctx.fillStyle = 'rgba(70, 130, 180, 0.8)'; // Steel blue with transparency
+        
+        // Left lens
+        this.ctx.beginPath();
+        this.ctx.arc(leftEye.x, leftEye.y, goggleSize * 0.45, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Right lens
+        this.ctx.beginPath();
+        this.ctx.arc(rightEye.x, rightEye.y, goggleSize * 0.45, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Lens reflections
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        
+        // Left reflection
+        this.ctx.beginPath();
+        this.ctx.arc(leftEye.x - goggleSize * 0.15, leftEye.y - goggleSize * 0.15, goggleSize * 0.15, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Right reflection
+        this.ctx.beginPath();
+        this.ctx.arc(rightEye.x - goggleSize * 0.15, rightEye.y - goggleSize * 0.15, goggleSize * 0.15, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Nose bridge
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.rect(
+            leftEye.x + goggleSize * 0.45, 
+            leftEye.y - goggleSize * 0.1, 
+            rightEye.x - leftEye.x - goggleSize * 0.9, 
+            goggleSize * 0.2
+        );
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Goggle straps
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 8;
+        this.ctx.lineCap = 'round';
+        
+        // Left strap
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftEye.x - goggleSize * 0.6, leftEye.y);
+        this.ctx.lineTo(leftEye.x - goggleSize * 1.2, leftEye.y);
+        this.ctx.stroke();
+        
+        // Right strap
+        this.ctx.beginPath();
+        this.ctx.moveTo(rightEye.x + goggleSize * 0.6, rightEye.y);
+        this.ctx.lineTo(rightEye.x + goggleSize * 1.2, rightEye.y);
+        this.ctx.stroke();
+    }
+    
+    drawOxygenMask(landmarks, faceWidth) {
+        const nose = this.getLandmarkPoint(landmarks, 1);
+        const mouth = this.getLandmarkPoint(landmarks, 13);
+        const leftMouth = this.getLandmarkPoint(landmarks, 61);
+        const rightMouth = this.getLandmarkPoint(landmarks, 291);
+        
+        const maskWidth = Math.abs(rightMouth.x - leftMouth.x) * 1.4;
+        const maskHeight = Math.abs(mouth.y - nose.y) * 1.8;
+        
+        // Oxygen mask body
+        this.ctx.fillStyle = '#696969'; // Dim gray
+        this.ctx.strokeStyle = '#2F2F2F';
+        this.ctx.lineWidth = 2;
+        
+        this.ctx.beginPath();
+        this.ctx.ellipse(
+            nose.x, 
+            nose.y + maskHeight * 0.3, 
+            maskWidth * 0.5, 
+            maskHeight * 0.4, 
+            0, 0, 2 * Math.PI
+        );
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Mask breathing holes
+        this.ctx.fillStyle = '#2F2F2F';
+        for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3;
+            const holeX = nose.x + Math.cos(angle) * maskWidth * 0.2;
+            const holeY = nose.y + maskHeight * 0.3 + Math.sin(angle) * maskHeight * 0.15;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(holeX, holeY, 2, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Oxygen tube
+        this.ctx.strokeStyle = '#4F4F4F';
+        this.ctx.lineWidth = 6;
+        this.ctx.lineCap = 'round';
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(nose.x + maskWidth * 0.3, nose.y + maskHeight * 0.4);
+        this.ctx.quadraticCurveTo(
+            nose.x + maskWidth * 0.8, 
+            nose.y + maskHeight * 0.6,
+            nose.x + maskWidth * 1.2, 
+            nose.y + maskHeight * 0.3
+        );
+        this.ctx.stroke();
+        
+        // Mask straps
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 4;
+        
+        // Left strap
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftMouth.x, mouth.y);
+        this.ctx.lineTo(leftMouth.x - faceWidth * 0.3, mouth.y);
+        this.ctx.stroke();
+        
+        // Right strap
+        this.ctx.beginPath();
+        this.ctx.moveTo(rightMouth.x, mouth.y);
+        this.ctx.lineTo(rightMouth.x + faceWidth * 0.3, mouth.y);
+        this.ctx.stroke();
+    }
+    
+    drawCockpitHUD() {
+        const time = Date.now() * 0.002;
+        
+        // HUD elements (Heads-Up Display)
+        this.ctx.strokeStyle = '#00FF00'; // Green HUD color
+        this.ctx.fillStyle = '#00FF00';
+        this.ctx.lineWidth = 2;
+        this.ctx.font = 'bold 14px monospace';
+        
+        // Altitude indicator (right side)
+        this.ctx.beginPath();
+        this.ctx.rect(this.canvas.width - 100, 50, 80, 150);
+        this.ctx.stroke();
+        
+        this.ctx.fillText('ALT', this.canvas.width - 95, 70);
+        this.ctx.fillText('10,000', this.canvas.width - 95, 90);
+        this.ctx.fillText('FT', this.canvas.width - 95, 110);
+        
+        // Speed indicator (left side)
+        this.ctx.beginPath();
+        this.ctx.rect(20, 50, 80, 150);
+        this.ctx.stroke();
+        
+        this.ctx.fillText('SPEED', 25, 70);
+        this.ctx.fillText('350', 25, 90);
+        this.ctx.fillText('KNOTS', 25, 110);
+        
+        // Artificial horizon (center)
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        
+        this.ctx.save();
+        this.ctx.translate(centerX, centerY);
+        this.ctx.rotate(Math.sin(time) * 0.1); // Subtle banking motion
+        
+        // Horizon line
+        this.ctx.strokeStyle = '#00FF00';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.moveTo(-100, 0);
+        this.ctx.lineTo(100, 0);
+        this.ctx.stroke();
+        
+        // Aircraft symbol
+        this.ctx.strokeStyle = '#FFFF00';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.moveTo(-30, 0);
+        this.ctx.lineTo(-10, 0);
+        this.ctx.moveTo(10, 0);
+        this.ctx.lineTo(30, 0);
+        this.ctx.moveTo(0, -15);
+        this.ctx.lineTo(0, 15);
+        this.ctx.stroke();
+        
+        this.ctx.restore();
+        
+        // Compass heading (top)
+        this.ctx.strokeStyle = '#00FF00';
+        this.ctx.fillStyle = '#00FF00';
+        this.ctx.font = 'bold 16px monospace';
+        
+        this.ctx.beginPath();
+        this.ctx.rect(centerX - 50, 60, 100, 30);
+        this.ctx.stroke();
+        
+        const heading = Math.floor((time * 10) % 360);
+        this.ctx.fillText(`HDG ${heading.toString().padStart(3, '0')}°`, centerX - 45, 80);
+        
+        // Engine parameters (bottom right)
+        this.ctx.font = 'bold 12px monospace';
+        this.ctx.fillText('ENG 1: OK', this.canvas.width - 100, this.canvas.height - 80);
+        this.ctx.fillText('ENG 2: OK', this.canvas.width - 100, this.canvas.height - 65);
+        this.ctx.fillText('FUEL: 75%', this.canvas.width - 100, this.canvas.height - 50);
+        
+        // Warning lights (animated)
+        if (Math.sin(time * 5) > 0.5) {
+            this.ctx.fillStyle = '#FF0000';
+            this.ctx.beginPath();
+            this.ctx.arc(30, this.canvas.height - 40, 8, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            this.ctx.fillStyle = '#FF0000';
+            this.ctx.font = 'bold 10px monospace';
+            this.ctx.fillText('ALERT', 45, this.canvas.height - 36);
+        }
+    }
+
     getLandmarkPoint(landmarks, index) {
         const point = landmarks[index];
         return {
@@ -1376,6 +1762,82 @@ class WebcamFilters {
 
     showLoading(show) {
         this.loading.style.display = show ? 'block' : 'none';
+    }
+
+    drawCockpitOverlay() {
+        // Draw only cockpit frame elements around the edges without covering the face
+        this.ctx.save();
+        
+        // Draw cockpit frame elements
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        this.ctx.strokeStyle = '#555';
+        this.ctx.lineWidth = 2;
+        
+        // Top cockpit frame - thinner
+        this.ctx.fillRect(0, 0, this.canvas.width, 30);
+        
+        // Side cockpit frames - narrower 
+        this.ctx.fillRect(0, 0, 40, this.canvas.height);
+        this.ctx.fillRect(this.canvas.width - 40, 0, 40, this.canvas.height);
+        
+        // Bottom frame
+        this.ctx.fillRect(0, this.canvas.height - 30, this.canvas.width, 30);
+        
+        // Add some subtle cockpit details
+        this.ctx.strokeStyle = '#888';
+        this.ctx.lineWidth = 1;
+        
+        // Top frame details
+        for (let i = 0; i < 5; i++) {
+            const x = (this.canvas.width / 6) * (i + 1);
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, 5);
+            this.ctx.lineTo(x, 25);
+            this.ctx.stroke();
+        }
+        
+        // Side frame rivets
+        for (let i = 0; i < 8; i++) {
+            const y = (this.canvas.height / 9) * (i + 1);
+            // Left side
+            this.ctx.fillStyle = '#666';
+            this.ctx.beginPath();
+            this.ctx.arc(20, y, 2, 0, 2 * Math.PI);
+            this.ctx.fill();
+            
+            // Right side
+            this.ctx.beginPath();
+            this.ctx.arc(this.canvas.width - 20, y, 2, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Add subtle sky effect in top corners only
+        const gradient = this.ctx.createLinearGradient(0, 30, 0, this.canvas.height * 0.3);
+        gradient.addColorStop(0, 'rgba(135, 206, 235, 0.1)'); // Light sky blue
+        gradient.addColorStop(1, 'rgba(135, 206, 235, 0)'); // Transparent
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(40, 30, this.canvas.width - 80, this.canvas.height * 0.2);
+        
+        // Add subtle clouds in top area only
+        const time = Date.now() * 0.001;
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        
+        for (let i = 0; i < 3; i++) {
+            const cloudX = (this.canvas.width * 0.3 * i + time * 15 + i * 100) % (this.canvas.width + 100) - 50;
+            const cloudY = 50 + Math.sin(time + i) * 10;
+            
+            // Small clouds in top area only
+            for (let j = 0; j < 3; j++) {
+                const radius = 8 + j * 3;
+                const offsetX = j * 8 - 8;
+                this.ctx.beginPath();
+                this.ctx.arc(cloudX + offsetX, cloudY, radius, 0, 2 * Math.PI);
+                this.ctx.fill();
+            }
+        }
+        
+        this.ctx.restore();
     }
 }
 
