@@ -192,6 +192,9 @@ class WebcamFilters {
             case 'crazy-face':
                 this.drawCrazyFace(landmarks);
                 break;
+            case 'hijab':
+                this.drawHijab(landmarks);
+                break;
         }
     }
 
@@ -1025,6 +1028,246 @@ class WebcamFilters {
                 nose.y + Math.cos(crazyTime * 3 + i) * 30,
                 chin.x + Math.sin(crazyTime * 5 + i) * 40,
                 chin.y
+            );
+            this.ctx.stroke();
+        }
+    }
+
+    drawHijab(landmarks) {
+        // Get key face landmarks for hijab positioning
+        const forehead = this.getLandmarkPoint(landmarks, 10);
+        const leftTemple = this.getLandmarkPoint(landmarks, 127);
+        const rightTemple = this.getLandmarkPoint(landmarks, 356);
+        const leftCheek = this.getLandmarkPoint(landmarks, 116);
+        const rightCheek = this.getLandmarkPoint(landmarks, 345);
+        const chin = this.getLandmarkPoint(landmarks, 175);
+        const jawLeft = this.getLandmarkPoint(landmarks, 172);
+        const jawRight = this.getLandmarkPoint(landmarks, 397);
+        
+        // Calculate hijab dimensions based on face size
+        const faceWidth = Math.abs(rightTemple.x - leftTemple.x);
+        const faceHeight = Math.abs(chin.y - forehead.y);
+        
+        // Hijab colors - elegant and common colors
+        const hijabColor = '#2C5F41'; // Deep green
+        const borderColor = '#1A4B33'; // Darker green for border
+        const patternColor = '#4A7C59'; // Lighter green for pattern
+        
+        // Set drawing style
+        this.ctx.fillStyle = hijabColor;
+        this.ctx.strokeStyle = borderColor;
+        this.ctx.lineWidth = 2;
+        
+        // Draw hijab in sections to avoid covering the face
+        
+        // 1. TOP SECTION - Over the head/forehead area
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftTemple.x - faceWidth * 0.4, forehead.y - faceHeight * 0.05);
+        
+        // Top curve over the head
+        this.ctx.quadraticCurveTo(
+            leftTemple.x - faceWidth * 0.2, 
+            forehead.y - faceHeight * 0.8,
+            forehead.x - faceWidth * 0.1, 
+            forehead.y - faceHeight * 1.0
+        );
+        
+        this.ctx.quadraticCurveTo(
+            forehead.x, 
+            forehead.y - faceHeight * 1.1,
+            forehead.x + faceWidth * 0.1, 
+            forehead.y - faceHeight * 1.0
+        );
+        
+        this.ctx.quadraticCurveTo(
+            rightTemple.x + faceWidth * 0.2, 
+            forehead.y - faceHeight * 0.8,
+            rightTemple.x + faceWidth * 0.4, 
+            forehead.y - faceHeight * 0.05
+        );
+        
+        // Connect to forehead area but don't cover face
+        this.ctx.lineTo(rightTemple.x + faceWidth * 0.1, forehead.y - faceHeight * 0.1);
+        this.ctx.quadraticCurveTo(
+            forehead.x + faceWidth * 0.05, 
+            forehead.y - faceHeight * 0.15,
+            forehead.x, 
+            forehead.y - faceHeight * 0.18
+        );
+        this.ctx.quadraticCurveTo(
+            forehead.x - faceWidth * 0.05, 
+            forehead.y - faceHeight * 0.15,
+            leftTemple.x - faceWidth * 0.1, 
+            forehead.y - faceHeight * 0.1
+        );
+        
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // 2. LEFT SIDE SECTION
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftTemple.x - faceWidth * 0.4, forehead.y - faceHeight * 0.05);
+        this.ctx.lineTo(leftTemple.x - faceWidth * 0.1, forehead.y - faceHeight * 0.1);
+        this.ctx.lineTo(leftCheek.x - faceWidth * 0.15, leftCheek.y + faceHeight * 0.1);
+        this.ctx.lineTo(leftCheek.x - faceWidth * 0.25, leftCheek.y + faceHeight * 0.2);
+        
+        // Extend down to shoulder
+        this.ctx.lineTo(leftCheek.x - faceWidth * 0.3, chin.y + faceHeight * 0.8);
+        this.ctx.quadraticCurveTo(
+            forehead.x - faceWidth * 0.5, 
+            chin.y + faceHeight * 1.2,
+            forehead.x - faceWidth * 0.2, 
+            chin.y + faceHeight * 1.0
+        );
+        this.ctx.lineTo(jawLeft.x - faceWidth * 0.1, chin.y + faceHeight * 0.3);
+        this.ctx.quadraticCurveTo(
+            leftCheek.x - faceWidth * 0.05, 
+            leftCheek.y + faceHeight * 0.15,
+            leftTemple.x - faceWidth * 0.35, 
+            leftTemple.y - faceHeight * 0.02
+        );
+        
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // 3. RIGHT SIDE SECTION
+        this.ctx.beginPath();
+        this.ctx.moveTo(rightTemple.x + faceWidth * 0.4, forehead.y - faceHeight * 0.05);
+        this.ctx.lineTo(rightTemple.x + faceWidth * 0.1, forehead.y - faceHeight * 0.1);
+        this.ctx.lineTo(rightCheek.x + faceWidth * 0.15, rightCheek.y + faceHeight * 0.1);
+        this.ctx.lineTo(rightCheek.x + faceWidth * 0.25, rightCheek.y + faceHeight * 0.2);
+        
+        // Extend down to shoulder
+        this.ctx.lineTo(rightCheek.x + faceWidth * 0.3, chin.y + faceHeight * 0.8);
+        this.ctx.quadraticCurveTo(
+            forehead.x + faceWidth * 0.5, 
+            chin.y + faceHeight * 1.2,
+            forehead.x + faceWidth * 0.2, 
+            chin.y + faceHeight * 1.0
+        );
+        this.ctx.lineTo(jawRight.x + faceWidth * 0.1, chin.y + faceHeight * 0.3);
+        this.ctx.quadraticCurveTo(
+            rightCheek.x + faceWidth * 0.05, 
+            rightCheek.y + faceHeight * 0.15,
+            rightTemple.x + faceWidth * 0.35, 
+            rightTemple.y - faceHeight * 0.02
+        );
+        
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // 4. BOTTOM SECTION - Under chin/neck area
+        this.ctx.beginPath();
+        this.ctx.moveTo(jawLeft.x - faceWidth * 0.1, chin.y + faceHeight * 0.3);
+        this.ctx.lineTo(forehead.x - faceWidth * 0.2, chin.y + faceHeight * 1.0);
+        this.ctx.quadraticCurveTo(
+            forehead.x, 
+            chin.y + faceHeight * 1.1,
+            forehead.x + faceWidth * 0.2, 
+            chin.y + faceHeight * 1.0
+        );
+        this.ctx.lineTo(jawRight.x + faceWidth * 0.1, chin.y + faceHeight * 0.3);
+        this.ctx.quadraticCurveTo(
+            forehead.x, 
+            chin.y + faceHeight * 0.5,
+            jawLeft.x - faceWidth * 0.1, 
+            chin.y + faceHeight * 0.3
+        );
+        
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Add subtle pattern/texture to the hijab (only on top section)
+        this.ctx.strokeStyle = patternColor;
+        this.ctx.lineWidth = 1;
+        this.ctx.globalAlpha = 0.4;
+        
+        // Delicate geometric pattern on the top section
+        for (let i = 0; i < 5; i++) {
+            const patternY = forehead.y - faceHeight * 0.9 + i * (faceHeight * 0.12);
+            const patternWidth = faceWidth * (0.6 - i * 0.08);
+            
+            // Horizontal decorative lines
+            this.ctx.beginPath();
+            this.ctx.moveTo(forehead.x - patternWidth * 0.5, patternY);
+            this.ctx.lineTo(forehead.x + patternWidth * 0.5, patternY);
+            this.ctx.stroke();
+            
+            // Small decorative dots
+            for (let j = -1; j <= 1; j++) {
+                if (i % 2 === 0) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(
+                        forehead.x + j * (patternWidth * 0.2), 
+                        patternY - 6, 
+                        1.5, 
+                        0, 
+                        2 * Math.PI
+                    );
+                    this.ctx.fill();
+                }
+            }
+        }
+        
+        this.ctx.globalAlpha = 1;
+        
+        // Add decorative border around face opening
+        this.ctx.strokeStyle = '#FFD700'; // Gold border
+        this.ctx.lineWidth = 2;
+        this.ctx.globalAlpha = 0.8;
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo(leftCheek.x - faceWidth * 0.15, leftCheek.y + faceHeight * 0.1);
+        this.ctx.quadraticCurveTo(
+            leftTemple.x - faceWidth * 0.05, 
+            forehead.y - faceHeight * 0.05,
+            forehead.x - faceWidth * 0.02, 
+            forehead.y - faceHeight * 0.12
+        );
+        this.ctx.quadraticCurveTo(
+            forehead.x, 
+            forehead.y - faceHeight * 0.15,
+            forehead.x + faceWidth * 0.02, 
+            forehead.y - faceHeight * 0.12
+        );
+        this.ctx.quadraticCurveTo(
+            rightTemple.x + faceWidth * 0.05, 
+            forehead.y - faceHeight * 0.05,
+            rightCheek.x + faceWidth * 0.15, 
+            rightCheek.y + faceHeight * 0.1
+        );
+        this.ctx.stroke();
+        
+        this.ctx.globalAlpha = 1;
+        
+        // Add a small decorative pin
+        this.ctx.fillStyle = '#FFD700'; // Gold color
+        this.ctx.strokeStyle = '#B8860B'; // Darker gold
+        this.ctx.lineWidth = 1;
+        
+        // Small decorative pin near the right temple
+        const pinX = rightTemple.x + faceWidth * 0.08;
+        const pinY = forehead.y - faceHeight * 0.08;
+        
+        this.ctx.beginPath();
+        this.ctx.arc(pinX, pinY, 3, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Small star pattern on the pin
+        this.ctx.strokeStyle = borderColor;
+        this.ctx.lineWidth = 1;
+        for (let i = 0; i < 4; i++) {
+            const angle = (i * Math.PI) / 2;
+            this.ctx.beginPath();
+            this.ctx.moveTo(pinX, pinY);
+            this.ctx.lineTo(
+                pinX + Math.cos(angle) * 2,
+                pinY + Math.sin(angle) * 2
             );
             this.ctx.stroke();
         }
